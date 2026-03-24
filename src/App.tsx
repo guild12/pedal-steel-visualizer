@@ -1,26 +1,45 @@
+import { useState } from 'react'
 import { Fretboard } from './components/Fretboard/Fretboard'
 import { ControlPanel } from './components/ControlPanel/ControlPanel'
+import { CopedentManager } from './components/CopedentManager/CopedentManager'
+import { CopedentEditor } from './components/CopedentEditor/CopedentEditor'
 import { useCopedentState } from './hooks/useCopedentState'
+import type { Copedent } from './types'
 
 function App() {
   const state = useCopedentState()
+  const [editorOpen, setEditorOpen] = useState(false)
+
+  const handleCreateNew = () => {
+    const newCopedent: Copedent = {
+      id: crypto.randomUUID(),
+      name: 'New Copedent',
+      pedals: ['A', 'B', 'C'],
+      kneeLevers: ['LKL', 'LKR'],
+      strings: Array.from({ length: 10 }, (_, i) => ({
+        number: i + 1,
+        openNote: 'E3',
+        changes: [],
+      })),
+    }
+    state.createCopedent(newCopedent)
+    setEditorOpen(true)
+  }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <header className="px-6 py-4 border-b border-gray-800">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold">Pedal Steel Visualizer</h1>
-          <div className="flex items-center gap-2">
-            <select
-              value={state.activeCopedentId}
-              onChange={e => state.setActiveCopedentId(e.target.value)}
-              className="bg-gray-800 text-white border border-gray-600 rounded px-3 py-1.5 text-sm"
-            >
-              {state.copedents.map(c => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
-          </div>
+          <CopedentManager
+            copedents={state.copedents}
+            activeCopedentId={state.activeCopedentId}
+            onSelect={state.setActiveCopedentId}
+            onDuplicate={state.duplicateCopedent}
+            onDelete={state.deleteCopedent}
+            onCreateNew={handleCreateNew}
+            onOpenEditor={() => setEditorOpen(!editorOpen)}
+          />
         </div>
       </header>
 
@@ -43,6 +62,14 @@ function App() {
           onDisplayModeChange={state.setDisplayMode}
           onSelectedKeyChange={state.setSelectedKey}
         />
+
+        {editorOpen && (
+          <CopedentEditor
+            copedent={state.activeCopedent}
+            onUpdate={(updates) => state.updateCopedent(state.activeCopedentId, updates)}
+            onClose={() => setEditorOpen(false)}
+          />
+        )}
       </main>
     </div>
   )
