@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { loadCopedents, saveCopedents, STORAGE_KEY } from './storage'
-import { E9_PRESET, C6_PRESET } from '../data/presets'
+import { E9_PRESET } from '../data/presets'
 import type { Copedent } from '../types'
 
 beforeEach(() => {

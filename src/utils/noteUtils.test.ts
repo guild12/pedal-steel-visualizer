@@ -6,7 +6,6 @@ import {
   normalizeNoteName,
   calculateFretNote,
   getScaleDegree,
-  NOTE_NAMES,
 } from './noteUtils'
 
 describe('parseNote', () => {

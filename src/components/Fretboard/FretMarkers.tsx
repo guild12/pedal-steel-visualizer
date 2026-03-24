@@ -1,3 +1,4 @@
+import React from 'react'
 import { getFretX, FRET_MARKER_FRETS, DOUBLE_DOT_FRETS } from '../../utils/fretUtils'
 
 interface FretMarkersProps {
@@ -7,7 +8,7 @@ interface FretMarkersProps {
 }
 
 export function FretMarkers({ fretboardWidth, fretboardHeight, leftMargin }: FretMarkersProps) {
-  const markers: JSX.Element[] = []
+  const markers: React.JSX.Element[] = []
   const midY = fretboardHeight / 2
 
   FRET_MARKER_FRETS.forEach(fret => {

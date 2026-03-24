@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import type { Copedent, NoteDisplayMode } from '../../types'
 import { TOTAL_FRETS } from '../../utils/fretUtils'
 import { getFretX } from '../../utils/fretUtils'
@@ -41,7 +41,7 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey 
   const totalSvgHeight = TOP_LABEL_HEIGHT + FRETBOARD_HEIGHT + BOTTOM_LABEL_HEIGHT
 
   // Fret number labels
-  const fretLabels: JSX.Element[] = []
+  const fretLabels: React.JSX.Element[] = []
   for (let fret = 0; fret <= TOTAL_FRETS; fret++) {
     let x: number
     if (fret === 0) {

@@ -1,5 +1,6 @@
+import React from 'react'
 import type { StringConfig, NoteDisplayMode } from '../../types'
-import { calculateFretNote, getScaleDegree, noteToMidi, midiToNoteName } from '../../utils/noteUtils'
+import { calculateFretNote, getScaleDegree } from '../../utils/noteUtils'
 import { getFretX, getStringY, TOTAL_FRETS } from '../../utils/fretUtils'
 
 interface NoteIndicatorsProps {
@@ -16,7 +17,7 @@ export function NoteIndicators({
   strings, engagedControls, displayMode, selectedKey,
   fretboardWidth, fretboardHeight, leftMargin,
 }: NoteIndicatorsProps) {
-  const indicators: JSX.Element[] = []
+  const indicators: React.JSX.Element[] = []
   const radius = 11
   const fontSize = 9
 

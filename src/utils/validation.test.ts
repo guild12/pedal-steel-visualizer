@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { validateCopedent, ValidationError } from './validation'
+import { validateCopedent } from './validation'
 import type { Copedent } from '../types'
 
 function makeCopedent(overrides: Partial<Copedent> = {}): Copedent {

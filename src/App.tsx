@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Fretboard } from './components/Fretboard/Fretboard'
 import { ControlPanel } from './components/ControlPanel/ControlPanel'
 import { CopedentManager } from './components/CopedentManager/CopedentManager'
@@ -25,6 +25,22 @@ function App() {
     state.createCopedent(newCopedent)
     setEditorOpen(true)
   }
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        state.clearAllControls()
+        return
+      }
+      const num = parseInt(e.key, 10)
+      if (!isNaN(num) && num >= 1 && num <= state.activeCopedent.pedals.length) {
+        if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') return
+        state.toggleControl(state.activeCopedent.pedals[num - 1])
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [state.activeCopedent.pedals, state.toggleControl, state.clearAllControls])
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
