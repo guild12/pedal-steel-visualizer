@@ -8,5 +8,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test-setup.ts',
     css: true,
+    env: {
+      NODE_OPTIONS: '--no-experimental-webstorage',
+    },
   },
 })
