@@ -18,11 +18,22 @@ All three modes integrate as overlays on the existing SVG fretboard. No separate
 
 Pedal steel guitar differs from standard guitar in how chords are voiced:
 
-- Players use a bar across strings and pick with typically 3 fingers (thumb can strum adjacent bass strings)
+- Players use a bar across strings and pick with typically 2 fingers + thumb (some players use 3 fingers + thumb). The thumb can strum adjacent bass strings.
 - Chord tones can be spread across non-adjacent strings — not limited to bar-adjacent voicings
 - In a band context, steel players often voice only the defining tones of a chord (3rd, 7th, color tones) while the band covers root and 5th
 - Copedents with many strings (up to 14) can produce complex extended chords when strummed with pedals/levers engaged
 - The relationship between pedal/lever combinations and resulting chord qualities is core to the instrument's identity
+
+### Physical Constraints on Controls
+
+These constraints limit which pedal/lever combinations are physically possible and must be enforced by the voicing search to avoid suggesting unplayable voicings:
+
+- **Pedals:** The right foot controls volume, so only the left foot operates pedals. A player can press at most 2 adjacent pedals simultaneously.
+- **Knee levers (left side):** Only 1 left-side knee lever can be engaged at a time.
+- **Knee levers (right side):** Only 1 right-side knee lever can be engaged at a time. Exception: vertical levers can sometimes be activated alongside an adjacent lever.
+- **Combined:** A maximum realistic combination is 2 adjacent pedals + 1 left knee lever + 1 right knee lever.
+
+These are defaults — advanced players or unusual setups may exceed them. The constraints should be configurable in a future iteration but enforced by default.
 
 ## 1. Chord Engine (`chordUtils.ts`)
 
@@ -110,20 +121,28 @@ interface ScoredChordName extends ChordName {
 
 Given a target chord, find all fret + pedal/lever combinations that produce it on the current copedent.
 
-**Input:** Target chord (root + quality), copedent data, fret range (default 0-24)
+**Input:** Target chord (root + quality), copedent data, fret range (default 0-11)
+
+**Fret range:** Notes repeat every 12 frets on a steel guitar (fret 12 = open, fret 13 = fret 1, etc.), so analysis only needs to cover frets 0-11. Results can be displayed at higher frets by transposition, but the search space is just 12 positions.
 
 **Algorithm:**
-For each fret position (0-24):
-  For each combination of engaged pedals/levers (including none):
+For each fret position (0-11):
+  For each *physically valid* combination of pedals/levers (see Physical Constraints):
     1. Calculate the resulting note on every string
     2. Extract pitch classes (remove octaves)
     3. Check which target chord tones are present
     4. If at least the root + one defining tone (3rd or 7th) are present, record as a voicing
 
-**Optimization:** The pedal/lever combination space can be large (2^N for N controls). Prune by:
-- Only evaluating combinations where at least one control changes a string's note to a target chord tone
-- Capping at a reasonable maximum (e.g., 4 simultaneous controls) unless the copedent regularly uses more
-- Short-circuiting when a complete voicing is found at a simpler combination
+**Control combination filtering:** Rather than evaluating all 2^N combinations, generate only physically valid ones:
+- Pedals: enumerate singles and adjacent pairs only
+- Left knee levers: enumerate singles only
+- Right knee levers: enumerate singles only (plus vertical lever adjacency exceptions)
+- Cross-product these groups for all valid combinations
+- This reduces a 2^12 (4,096) space to roughly 50-100 realistic combinations
+
+**Additional pruning:**
+- Only evaluate combinations where at least one control changes a string's note to a target chord tone
+- Short-circuit when a complete voicing is found at a simpler combination
 
 **Voicing scoring:**
 
@@ -428,16 +447,17 @@ This state is derived/computed — it doesn't persist to localStorage. The chord
 
 ### Voicing Search Optimization
 
-The combinatorial space of frets x pedal/lever combinations can be large:
-- 25 frets x 2^N control combinations (N = pedals + levers)
-- For a typical E9 copedent: N = 8 → 256 combinations per fret → 6,400 total evaluations
-- For a 14-string copedent with 12+ controls: N = 12+ → needs pruning
+The search space is manageable thanks to two key constraints:
 
-**Mitigations:**
-- Pre-filter control combinations: only evaluate combos where at least one control produces a target chord tone on some string
+1. **Fret range is 0-11** — notes repeat every 12 frets, so only 12 positions need analysis
+2. **Physical control constraints** reduce combinations from 2^N to ~50-100 valid combos (see Section "Physical Constraints on Controls")
+
+For a typical E9 copedent: 12 frets x ~80 valid combos = ~960 evaluations (trivially fast).
+
+**Additional mitigations:**
+- Pre-filter control combinations: only evaluate combos where at least one control produces a target chord tone
 - Cache results per copedent (copedent data changes rarely)
 - Debounce recalculation on rapid pedal toggling (100ms)
-- Run voicing search in a web worker if calculation exceeds 16ms (to avoid blocking UI)
 
 ### Transition Search
 
