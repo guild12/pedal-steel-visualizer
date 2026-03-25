@@ -19,6 +19,8 @@ export interface Copedent {
 
 export type NoteDisplayMode = 'letters' | 'scaleDegrees';
 
+export type ColorTheme = 'chordTones' | 'rootFocus' | 'perFunction';
+
 export interface AppState {
   copedents: Copedent[];
   activeCopedentId: string;
