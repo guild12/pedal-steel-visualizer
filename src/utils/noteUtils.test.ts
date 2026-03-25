@@ -84,3 +84,30 @@ describe('getScaleDegree', () => {
   it('returns b7 for minor seventh', () => { expect(getScaleDegree('A#', 'C')).toBe('b7') })
   it('works with non-C keys', () => { expect(getScaleDegree('E', 'A')).toBe('5') })
 })
+
+import { calculateFretNoteWithOctave } from './noteUtils'
+
+describe('calculateFretNoteWithOctave', () => {
+  it('returns note with octave at fret 0 with no controls', () => {
+    const result = calculateFretNoteWithOctave('E4', 0, [], new Set())
+    expect(result).toBe('E4')
+  })
+
+  it('increments octave when crossing B to C', () => {
+    const result = calculateFretNoteWithOctave('B3', 1, [], new Set())
+    expect(result).toBe('C4')
+  })
+
+  it('applies control changes and fret offset', () => {
+    const changes = [{ control: 'A', semitones: 2 }]
+    const result = calculateFretNoteWithOctave('E4', 3, changes, new Set(['A']))
+    // E4 + 3 frets + 2 semitones = E4 + 5 = A4
+    expect(result).toBe('A4')
+  })
+
+  it('handles octave wrap-around correctly', () => {
+    const result = calculateFretNoteWithOctave('G#4', 5, [], new Set())
+    // G#4 + 5 = C#5
+    expect(result).toBe('C#5')
+  })
+})

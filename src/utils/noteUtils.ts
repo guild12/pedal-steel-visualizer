@@ -49,3 +49,28 @@ export function getScaleDegree(noteName: string, key: string): string {
   const interval = ((noteIndex - keyIndex) + 12) % 12
   return SCALE_DEGREE_LABELS[interval]
 }
+
+/**
+ * Like calculateFretNote but returns note name with octave (e.g., "C#4").
+ */
+export function calculateFretNoteWithOctave(
+  openNote: string,
+  fret: number,
+  changes: StringChange[],
+  engagedControls: Set<string> = new Set(),
+): string {
+  const baseMidi = noteToMidi(openNote)
+
+  let semitoneOffset = fret
+  for (const change of changes) {
+    if (engagedControls.has(change.control)) {
+      semitoneOffset += change.semitones
+    }
+  }
+
+  const resultMidi = baseMidi + semitoneOffset
+  const resultName = midiToNoteName(resultMidi)
+  const resultOctave = Math.floor(resultMidi / 12) - 1
+
+  return `${resultName}${resultOctave}`
+}
