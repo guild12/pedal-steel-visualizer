@@ -22,7 +22,7 @@ export function ChordAnalyzerBadge({
 
   return (
     <div
-      className={`absolute top-2 right-2 rounded-lg border-2 ${borderColor} bg-gray-950 px-3 py-2 cursor-pointer z-10 min-w-[160px]`}
+      className={`inline-block rounded-lg border-2 ${borderColor} bg-gray-950 px-3 py-2 cursor-pointer min-w-[160px]`}
       onClick={() => setExpanded(!expanded)}
     >
       <div className="text-gray-500 text-[10px] uppercase tracking-wider">

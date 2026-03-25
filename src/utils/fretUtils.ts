@@ -1,18 +1,15 @@
-export const TOTAL_FRETS = 24
+export const TOTAL_FRETS = 12
 
-export const FRET_MARKER_FRETS = [3, 5, 7, 9, 12, 15, 17, 19, 21, 24]
-export const DOUBLE_DOT_FRETS = new Set([12, 24])
+export const FRET_MARKER_FRETS = [3, 5, 7, 9, 12]
+export const DOUBLE_DOT_FRETS = new Set([12])
 
 /**
- * Calculate fret X position using real scale-length formula.
- * Position = scaleLength * (1 - 1 / 2^(fret/12))
- * Normalized to fit within totalWidth.
+ * Calculate fret X position using even spacing.
+ * On pedal steel, the bar sits directly on the fret line,
+ * so frets are evenly spaced with notes centered on each line.
  */
 export function getFretX(fret: number, totalWidth: number): number {
-  if (fret === 0) return 0
-  const maxPos = 1 - 1 / Math.pow(2, TOTAL_FRETS / 12)
-  const pos = 1 - 1 / Math.pow(2, fret / 12)
-  return (pos / maxPos) * totalWidth
+  return (fret / TOTAL_FRETS) * totalWidth
 }
 
 /**

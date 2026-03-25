@@ -35,8 +35,8 @@ describe('Fretboard', () => {
     const { container } = render(<Fretboard {...defaultProps} />)
     const noteGroup = container.querySelector('.note-indicators')
     const circles = noteGroup?.querySelectorAll('circle') ?? []
-    // 10 strings x 25 frets (0-24) = 250 circles
-    expect(circles.length).toBe(250)
+    // 10 strings x 13 frets (0-12) = 130 circles
+    expect(circles.length).toBe(130)
   })
 
   it('highlights changed notes when controls are engaged', () => {

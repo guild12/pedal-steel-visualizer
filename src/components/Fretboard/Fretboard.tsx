@@ -48,17 +48,10 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
   const totalSvgWidth = LEFT_MARGIN + fretboardWidth + 10
   const totalSvgHeight = TOP_LABEL_HEIGHT + FRETBOARD_HEIGHT + BOTTOM_LABEL_HEIGHT
 
-  // Fret number labels
+  // Fret number labels — directly on fret lines (bar positions)
   const fretLabels: React.JSX.Element[] = []
   for (let fret = 0; fret <= TOTAL_FRETS; fret++) {
-    let x: number
-    if (fret === 0) {
-      x = LEFT_MARGIN - 2
-    } else {
-      const prevX = LEFT_MARGIN + getFretX(fret - 1, fretboardWidth)
-      const currX = LEFT_MARGIN + getFretX(fret, fretboardWidth)
-      x = (prevX + currX) / 2
-    }
+    const x = LEFT_MARGIN + getFretX(fret, fretboardWidth)
     fretLabels.push(
       <text
         key={fret}
@@ -97,11 +90,12 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
   })
 
   return (
-    <div ref={containerRef} className="w-full overflow-x-auto">
+    <div ref={containerRef} className="w-full">
       <svg
-        width={totalSvgWidth}
+        width="100%"
         height={totalSvgHeight}
         viewBox={`0 0 ${totalSvgWidth} ${totalSvgHeight}`}
+        preserveAspectRatio="xMinYMid meet"
       >
         {/* Fret numbers */}
         <g>{fretLabels}</g>
@@ -137,16 +131,16 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
             chordNotes={chordNotes}
           />
 
-          {/* Clickable fret regions — invisible rects for click targets */}
-          {Array.from({ length: 12 }, (_, fret) => {
-            const x1 = fret === 0 ? 0 : getFretX(fret, fretboardWidth);
-            const x2 = getFretX(fret + 1, fretboardWidth);
+          {/* Clickable fret regions — centered on each fret line */}
+          {Array.from({ length: 13 }, (_, fret) => {
+            const cx = LEFT_MARGIN + getFretX(fret, fretboardWidth);
+            const halfGap = (fretboardWidth / TOTAL_FRETS) / 2;
             return (
               <rect
                 key={`fret-click-${fret}`}
-                x={LEFT_MARGIN + x1}
+                x={cx - halfGap}
                 y={0}
-                width={x2 - x1}
+                width={halfGap * 2}
                 height={FRETBOARD_HEIGHT}
                 fill="transparent"
                 className="cursor-pointer"
@@ -155,23 +149,27 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
             );
           })}
 
-          {/* Selected fret highlight */}
-          {selectedFret != null && (
-            <rect
-              x={LEFT_MARGIN + (selectedFret === 0 ? 0 : getFretX(selectedFret, fretboardWidth))}
-              y={0}
-              width={getFretX(selectedFret + 1, fretboardWidth) - (selectedFret === 0 ? 0 : getFretX(selectedFret, fretboardWidth))}
-              height={FRETBOARD_HEIGHT}
-              rx={4}
-              fill="#00E5D0"
-              fillOpacity={0.08}
-              stroke="#00E5D0"
-              strokeOpacity={0.4}
-              strokeWidth={2}
-              strokeDasharray="4,3"
-              pointerEvents="none"
-            />
-          )}
+          {/* Selected fret highlight — vertical strip centered on fret line */}
+          {selectedFret != null && (() => {
+            const cx = LEFT_MARGIN + getFretX(selectedFret, fretboardWidth);
+            const halfGap = (fretboardWidth / TOTAL_FRETS) / 2;
+            return (
+              <rect
+                x={cx - halfGap}
+                y={0}
+                width={halfGap * 2}
+                height={FRETBOARD_HEIGHT}
+                rx={4}
+                fill="#00E5D0"
+                fillOpacity={0.08}
+                stroke="#00E5D0"
+                strokeOpacity={0.4}
+                strokeWidth={2}
+                strokeDasharray="4,3"
+                pointerEvents="none"
+              />
+            );
+          })()}
 
           {/* Chord finder overlay */}
           {finderResults && finderResults.length > 0 && finderTargetChord && (

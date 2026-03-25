@@ -31,14 +31,8 @@ export function NoteIndicators({
       const openFretNote = calculateFretNote(s.openNote, fret, s.changes, new Set())
       const isHighlighted = activeNote !== openFretNote
 
-      let x: number
-      if (fret === 0) {
-        x = leftMargin - 2
-      } else {
-        const prevFretX = leftMargin + getFretX(fret - 1, fretboardWidth)
-        const currFretX = leftMargin + getFretX(fret, fretboardWidth)
-        x = (prevFretX + currFretX) / 2
-      }
+      // Notes sit directly on the fret line (bar position)
+      const x = leftMargin + getFretX(fret, fretboardWidth)
 
       const displayText = displayMode === 'scaleDegrees'
         ? getScaleDegree(activeNote, selectedKey)

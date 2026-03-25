@@ -98,7 +98,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <header className="px-6 py-4 border-b border-gray-800">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between max-w-3xl">
           <h1 className="text-xl font-bold">Pedal Steel Visualizer</h1>
           <CopedentManager
             copedents={state.copedents}
@@ -124,7 +124,7 @@ function App() {
         </div>
       </header>
 
-      <main className="p-6 space-y-6">
+      <main className="p-6 space-y-6 max-w-3xl">
         {/* Chord Picker (above fretboard) */}
         {chordState.chordFinder?.active && (
           <ChordPicker
@@ -145,25 +145,25 @@ function App() {
           />
         )}
 
-        {/* Fretboard with chord overlays */}
-        <div className="relative">
-          <Fretboard
-            copedent={state.activeCopedent}
-            engagedControls={state.engagedControls}
-            displayMode={state.displayMode}
-            selectedKey={state.selectedKey}
-            selectedFret={chordState.selectedFret}
-            onFretClick={(fret) => chordState.selectFret(fret)}
-            chordNotes={chordNotesMap}
-            finderResults={finderResults}
-            finderTargetChord={chordState.chordFinder?.targetChord ?? null}
-          />
-          <ChordAnalyzerBadge
-            detection={currentDetection}
-            fret={chordState.selectedFret}
-            hasEngagedControls={state.engagedControls.size > 0}
-          />
-        </div>
+        {/* Fretboard */}
+        <Fretboard
+          copedent={state.activeCopedent}
+          engagedControls={state.engagedControls}
+          displayMode={state.displayMode}
+          selectedKey={state.selectedKey}
+          selectedFret={chordState.selectedFret}
+          onFretClick={(fret) => chordState.selectFret(fret)}
+          chordNotes={chordNotesMap}
+          finderResults={finderResults}
+          finderTargetChord={chordState.chordFinder?.targetChord ?? null}
+        />
+
+        {/* Chord analyzer badge — below fretboard */}
+        <ChordAnalyzerBadge
+          detection={currentDetection}
+          fret={chordState.selectedFret}
+          hasEngagedControls={state.engagedControls.size > 0}
+        />
 
         {/* Transition Results (below fretboard) */}
         {chordState.chordTransition?.active && transitionResults.length > 0 && (
