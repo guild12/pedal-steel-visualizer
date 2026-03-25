@@ -1,6 +1,7 @@
-import type { NoteDisplayMode } from '../../types'
+import type { NoteDisplayMode, ColorTheme } from '../../types'
 import { ToggleButton } from './ToggleButton'
 import { DisplayOptions } from './DisplayOptions'
+import { ColorThemeSelector } from './ColorThemeSelector'
 
 interface ControlPanelProps {
   pedals: string[];
@@ -17,6 +18,8 @@ interface ControlPanelProps {
   onTransitionToggle?: () => void;
   chordFinderActive?: boolean;
   transitionActive?: boolean;
+  colorTheme?: ColorTheme;
+  onColorThemeChange?: (theme: ColorTheme) => void;
 }
 
 export function ControlPanel({
@@ -24,6 +27,7 @@ export function ControlPanel({
   displayMode, selectedKey, onDisplayModeChange, onSelectedKeyChange,
   onChordFinderToggle, onTransitionToggle,
   chordFinderActive = false, transitionActive = false,
+  colorTheme = 'chordTones', onColorThemeChange,
 }: ControlPanelProps) {
   return (
     <div className="space-y-4">
@@ -91,6 +95,12 @@ export function ControlPanel({
           onDisplayModeChange={onDisplayModeChange}
           onSelectedKeyChange={onSelectedKeyChange}
         />
+        {onColorThemeChange && (
+          <ColorThemeSelector
+            colorTheme={colorTheme}
+            onChange={onColorThemeChange}
+          />
+        )}
       </div>
     </div>
   )
