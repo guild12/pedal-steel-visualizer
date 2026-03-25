@@ -10,6 +10,7 @@ interface ChordAnalyzerBadgeProps {
   colorTheme?: ColorTheme;
   overrideChord?: ChordName | null;
   onChordOverride?: (chord: ChordName | null) => void;
+  activeExtensions?: string[];
 }
 
 export function ChordAnalyzerBadge({
@@ -19,6 +20,7 @@ export function ChordAnalyzerBadge({
   colorTheme = 'chordTones',
   overrideChord = null,
   onChordOverride,
+  activeExtensions,
 }: ChordAnalyzerBadgeProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -30,6 +32,9 @@ export function ChordAnalyzerBadge({
   // Determine displayed chord: override wins over auto-detected
   const displayedChord = overrideChord ?? primary;
   const isOverridden = overrideChord !== null;
+
+  // Extensions: use activeExtensions from parent (handles both detected and override)
+  const extensions = activeExtensions ?? layers.extensions;
 
   // Build the "Also" list: swap original primary in when overridden
   const alsoList = isOverridden
@@ -66,10 +71,10 @@ export function ChordAnalyzerBadge({
         {isOverridden && (
           <span className="text-[10px] text-gray-500">(selected)</span>
         )}
-        {!isOverridden && layers.extensions.length > 0 && (
+        {extensions.length > 0 && (
           <span className="text-sm font-semibold flex gap-1.5">
             +
-            {layers.extensions.map((e, i) => (
+            {extensions.map((e, i) => (
               <span key={i} style={{ color: resolveChordColor(e.split(' ')[0], colorTheme) ?? '#F4A261' }}>
                 {e.split(' ')[0]}
               </span>
@@ -80,10 +85,10 @@ export function ChordAnalyzerBadge({
 
       {expanded && (
         <div className="mt-2 pt-2 border-t border-gray-800">
-          {!isOverridden && layers.extensions.length > 0 && (
+          {extensions.length > 0 && (
             <div className="text-xs mb-1">
               <span className="text-gray-500">Extensions: </span>
-              {layers.extensions.map((ext, i) => (
+              {extensions.map((ext, i) => (
                 <span key={i}>
                   {i > 0 && <span className="text-gray-600">, </span>}
                   <span style={{ color: resolveChordColor(ext.split(' ')[0], colorTheme) ?? '#F4A261' }}>{ext}</span>

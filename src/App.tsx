@@ -5,7 +5,7 @@ import { CopedentManager } from './components/CopedentManager/CopedentManager'
 import { CopedentEditor } from './components/CopedentEditor/CopedentEditor'
 import { useCopedentState } from './hooks/useCopedentState'
 import { useChordState } from './hooks/useChordState'
-import { detectChord, getChordTones } from './utils/chordDetection'
+import { detectChord, getChordTones, getExtensions, noteNameToSemitone } from './utils/chordDetection'
 import { findVoicings } from './utils/voicingSearch'
 import { findTransitions } from './utils/transitionScoring'
 import { calculateFretNote, NOTE_NAMES } from './utils/noteUtils'
@@ -43,6 +43,20 @@ function App() {
   // Active chord: override wins over auto-detected
   const activeChord = overrideChord ?? currentDetection?.primary ?? null;
 
+  // Compute extensions for override chord (reanalyze against current fretboard notes)
+  const overrideExtensions = useMemo(() => {
+    if (!overrideChord || chordState.selectedFret == null) return [];
+    const fret = chordState.selectedFret ?? 0;
+    const notes = state.activeCopedent.strings.map(s =>
+      calculateFretNote(s.openNote, fret, s.changes, state.engagedControls)
+    );
+    const pitchClasses = [...new Set(notes.map(n => noteNameToSemitone(n)))];
+    return getExtensions(overrideChord.root, overrideChord.quality, pitchClasses).extensions;
+  }, [overrideChord, chordState.selectedFret, state.activeCopedent, state.engagedControls]);
+
+  // Active extensions: override-computed or detected
+  const activeExtensions = overrideChord ? overrideExtensions : (currentDetection?.layers.extensions ?? []);
+
   // Compute chord notes map for coloring (pitch class → function label)
   const chordNotesMap = useMemo(() => {
     if (!activeChord || chordState.selectedFret == null) return null;
@@ -60,18 +74,16 @@ function App() {
       }
     }
 
-    // Extension tones — only when showing the detected primary (not an override)
-    if (!overrideChord && currentDetection) {
-      for (const ext of currentDetection.layers.extensions) {
-        const match = ext.match(/^([b#]?\d+)\s+\(([A-G]#?)\)/);
-        if (match) {
-          map.set(match[2], match[1]);
-        }
+    // Extension tones — from active extensions (works for both detected and override)
+    for (const ext of activeExtensions) {
+      const match = ext.match(/^([b#]?\d+)\s+\(([A-G]#?)\)/);
+      if (match) {
+        map.set(match[2], match[1]);
       }
     }
 
     return map;
-  }, [activeChord, overrideChord, currentDetection, chordState.selectedFret]);
+  }, [activeChord, activeExtensions, chordState.selectedFret]);
 
   // Compute voicing search results for chord finder
   const finderResults = useMemo(() => {
@@ -194,6 +206,7 @@ function App() {
           colorTheme={state.colorTheme}
           overrideChord={overrideChord}
           onChordOverride={setOverrideChord}
+          activeExtensions={activeExtensions}
         />
 
         {/* Transition Results (below fretboard) */}

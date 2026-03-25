@@ -135,15 +135,23 @@ export function detectChord(notes: string[]): ChordDetectionResult {
  * Build layered breakdown (core chord + extensions).
  */
 function buildLayers(primary: ChordName, pitchClasses: number[]): ChordLayers {
-  const rootSemitone = noteNameToSemitone(primary.root);
+  const { extensions } = getExtensions(primary.root, primary.quality, pitchClasses);
+  return { core: primary.display, extensions };
+}
+
+/**
+ * Compute extension tones for any chord against a set of pitch classes.
+ * Returns extensions as formatted strings like "9 (D)", "b5 (G#)".
+ */
+export function getExtensions(root: string, quality: string, pitchClasses: number[]): { extensions: string[] } {
+  const rootSemitone = noteNameToSemitone(root);
   const intervals = pitchClasses
     .map(pc => (pc - rootSemitone + 12) % 12)
     .sort((a, b) => a - b);
 
-  // Find the matching chord definition
-  const chordDef = CHORD_DICTIONARY.find(c => c.quality === primary.quality);
+  const chordDef = CHORD_DICTIONARY.find(c => c.quality === quality);
   if (!chordDef) {
-    return { core: primary.display, extensions: [] };
+    return { extensions: [] };
   }
 
   const chordIntervalsMod12 = chordDef.intervals.map((iv: number) => iv % 12);
@@ -157,7 +165,7 @@ function buildLayers(primary: ChordName, pitchClasses: number[]): ChordLayers {
     }
   }
 
-  return { core: primary.display, extensions };
+  return { extensions };
 }
 
 const QUALITY_ALIASES: Record<string, string> = {
