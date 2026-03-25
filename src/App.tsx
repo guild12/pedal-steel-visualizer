@@ -31,18 +31,32 @@ function App() {
     return detectChord(notes);
   }, [chordState.selectedFret, state.engagedControls, state.activeCopedent]);
 
-  // Compute chord notes map for coloring (pitch class → chord function)
+  // Compute chord notes map for coloring (pitch class → function label)
+  // Function labels: 'root', '3rd', 'b3', '5th', '7th', '9', etc.
   const chordNotesMap = useMemo(() => {
     if (!currentDetection || chordState.selectedFret == null) return null;
     const map = new Map<string, string>();
     const rootSemitone = NOTE_NAMES.indexOf(currentDetection.primary.root as typeof NOTE_NAMES[number]);
     if (rootSemitone === -1) return null;
+
+    // Core chord tones — compute relative interval from root to get function label
     const tones = getChordTones(currentDetection.primary.root, currentDetection.primary.quality);
     for (const semitone of tones) {
-      const noteName = NOTE_NAMES[semitone % 12];
       const interval = (semitone - rootSemitone + 12) % 12;
-      map.set(noteName, INTERVAL_TO_FUNCTION[interval] ?? 'root');
+      const fn = INTERVAL_TO_FUNCTION[interval];
+      if (fn) {
+        map.set(NOTE_NAMES[semitone % 12], fn);
+      }
     }
+
+    // Extension tones — use the interval prefix as function label
+    for (const ext of currentDetection.layers.extensions) {
+      const match = ext.match(/^([b#]?\d+)\s+\(([A-G]#?)\)/);
+      if (match) {
+        map.set(match[2], match[1]);
+      }
+    }
+
     return map;
   }, [currentDetection, chordState.selectedFret]);
 
@@ -156,6 +170,7 @@ function App() {
           chordNotes={chordNotesMap}
           finderResults={finderResults}
           finderTargetChord={chordState.chordFinder?.targetChord ?? null}
+          colorTheme={state.colorTheme}
         />
 
         {/* Chord analyzer badge — below fretboard */}
@@ -163,6 +178,7 @@ function App() {
           detection={currentDetection}
           fret={chordState.selectedFret}
           hasEngagedControls={state.engagedControls.size > 0}
+          colorTheme={state.colorTheme}
         />
 
         {/* Transition Results (below fretboard) */}
@@ -200,6 +216,8 @@ function App() {
               chordState.activateTransition('E', 'maj', 'A', 'maj');
             }
           }}
+          colorTheme={state.colorTheme}
+          onColorThemeChange={state.setColorTheme}
         />
 
         {editorOpen && (
