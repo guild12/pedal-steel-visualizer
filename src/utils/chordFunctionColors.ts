@@ -1,4 +1,5 @@
 // src/utils/chordFunctionColors.ts
+import type { ColorTheme } from '../types';
 
 /** Chord function → color mapping for note indicators */
 export const CHORD_FUNCTION_COLORS: Record<string, string> = {
@@ -28,4 +29,47 @@ export const NON_CHORD_TONE_COLOR = '#444444';
 export function getChordFunctionColor(chordFunction: string | null): string {
   if (!chordFunction) return NON_CHORD_TONE_COLOR;
   return CHORD_FUNCTION_COLORS[chordFunction] ?? '#9b59b6';
+}
+
+// Core tones: root, 3rd, b3, 5th, b5, #5, 6th, 7th, b7
+const CORE_FUNCTIONS = new Set([
+  'root', '3rd', 'b3', '5th', 'b5', '#5', '6th', '7th', 'b7',
+]);
+
+const CHORD_TONES_PALETTE = {
+  core: '#00E5D0',      // cyan
+  extension: '#F4A261', // orange
+} as const;
+
+const ROOT_FOCUS_PALETTE = {
+  root: '#00E5D0',      // cyan
+  core: '#7B8CDE',      // periwinkle
+  extension: '#F4A261', // orange
+} as const;
+
+/**
+ * Resolve the display color for a chord function label under the given theme.
+ * Returns null when chordFunction is null (non-chord notes — callers handle styling).
+ */
+export function resolveChordColor(
+  chordFunction: string | null,
+  theme: ColorTheme,
+): string | null {
+  if (chordFunction === null) return null;
+
+  switch (theme) {
+    case 'chordTones':
+      return CORE_FUNCTIONS.has(chordFunction)
+        ? CHORD_TONES_PALETTE.core
+        : CHORD_TONES_PALETTE.extension;
+
+    case 'rootFocus':
+      if (chordFunction === 'root') return ROOT_FOCUS_PALETTE.root;
+      return CORE_FUNCTIONS.has(chordFunction)
+        ? ROOT_FOCUS_PALETTE.core
+        : ROOT_FOCUS_PALETTE.extension;
+
+    case 'perFunction':
+      return CHORD_FUNCTION_COLORS[chordFunction] ?? '#9b59b6';
+  }
 }
