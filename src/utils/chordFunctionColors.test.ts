@@ -147,4 +147,32 @@ describe('resolveChordColor', () => {
       expect(resolveChordColor('unknown', 'perFunction')).toBe('#9b59b6');
     });
   });
+
+  describe('isExtension flag (fundamental rule)', () => {
+    it('forces orange for b5 extension in chordTones even though b5 is a core function', () => {
+      expect(resolveChordColor('b5', 'chordTones', true)).toBe('#F4A261');
+    });
+
+    it('forces orange for b5 extension in rootFocus', () => {
+      expect(resolveChordColor('b5', 'rootFocus', true)).toBe('#F4A261');
+    });
+
+    it('forces purple for b5 extension in perFunction instead of periwinkle', () => {
+      expect(resolveChordColor('b5', 'perFunction', true)).toBe('#9b59b6');
+    });
+
+    it('forces extension color even for root label if marked as extension', () => {
+      expect(resolveChordColor('root', 'chordTones', true)).toBe('#F4A261');
+      expect(resolveChordColor('root', 'perFunction', true)).toBe('#9b59b6');
+    });
+
+    it('does not force extension color when isExtension is false', () => {
+      expect(resolveChordColor('5th', 'perFunction', false)).toBe('#7B8CDE');
+      expect(resolveChordColor('5th', 'chordTones', false)).toBe('#00E5D0');
+    });
+
+    it('returns null for null chordFunction regardless of isExtension', () => {
+      expect(resolveChordColor(null, 'chordTones', true)).toBeNull();
+    });
+  });
 });

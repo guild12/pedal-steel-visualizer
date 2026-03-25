@@ -17,7 +17,7 @@ interface FretboardProps {
   // New chord props
   selectedFret?: number | null;
   onFretClick?: (fret: number) => void;
-  chordNotes?: Map<string, string> | null;
+  chordNotes?: Map<string, { fn: string; isExtension: boolean }> | null;
   finderResults?: VoicingResult[] | null;
   finderTargetChord?: { root: string; quality: string } | null;
   colorTheme?: ColorTheme;

@@ -57,10 +57,10 @@ function App() {
   // Active extensions: override-computed or detected
   const activeExtensions = overrideChord ? overrideExtensions : (currentDetection?.layers.extensions ?? []);
 
-  // Compute chord notes map for coloring (pitch class → function label)
+  // Compute chord notes map for coloring (pitch class → { fn, isExtension })
   const chordNotesMap = useMemo(() => {
     if (!activeChord || chordState.selectedFret == null) return null;
-    const map = new Map<string, string>();
+    const map = new Map<string, { fn: string; isExtension: boolean }>();
     const rootSemitone = NOTE_NAMES.indexOf(activeChord.root as typeof NOTE_NAMES[number]);
     if (rootSemitone === -1) return null;
 
@@ -70,15 +70,15 @@ function App() {
       const interval = (semitone - rootSemitone + 12) % 12;
       const fn = INTERVAL_TO_FUNCTION[interval];
       if (fn) {
-        map.set(NOTE_NAMES[semitone % 12], fn);
+        map.set(NOTE_NAMES[semitone % 12], { fn, isExtension: false });
       }
     }
 
-    // Extension tones — from active extensions (works for both detected and override)
+    // Extension tones — always marked as extensions
     for (const ext of activeExtensions) {
       const match = ext.match(/^([b#]?\d+)\s+\(([A-G]#?)\)/);
       if (match) {
-        map.set(match[2], match[1]);
+        map.set(match[2], { fn: match[1], isExtension: true });
       }
     }
 

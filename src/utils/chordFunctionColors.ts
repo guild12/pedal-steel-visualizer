@@ -47,15 +47,31 @@ const ROOT_FOCUS_PALETTE = {
   extension: '#F4A261', // orange
 } as const;
 
+/** Extension color per theme — the fundamental rule: extensions always get this color */
+const EXTENSION_COLORS: Record<ColorTheme, string> = {
+  chordTones: '#F4A261',  // orange
+  rootFocus: '#F4A261',   // orange
+  perFunction: '#9b59b6', // purple
+};
+
 /**
  * Resolve the display color for a chord function label under the given theme.
  * Returns null when chordFunction is null (non-chord notes — callers handle styling).
+ *
+ * Fundamental rule: when isExtension is true, the note always gets the theme's
+ * extension color regardless of its function label. This ensures that e.g. a b5
+ * extension is visually distinct from a core 5th, even if they're in the same
+ * function family. Future themes get this behavior automatically.
  */
 export function resolveChordColor(
   chordFunction: string | null,
   theme: ColorTheme,
+  isExtension = false,
 ): string | null {
   if (chordFunction === null) return null;
+
+  // Fundamental rule: extensions always get the extension color
+  if (isExtension) return EXTENSION_COLORS[theme];
 
   switch (theme) {
     case 'chordTones':

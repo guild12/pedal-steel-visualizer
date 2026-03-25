@@ -12,7 +12,7 @@ interface NoteIndicatorsProps {
   fretboardWidth: number;
   fretboardHeight: number;
   leftMargin: number;
-  chordNotes?: Map<string, string> | null;  // pitch class → function label (e.g., 'root', '3rd', '9')
+  chordNotes?: Map<string, { fn: string; isExtension: boolean }> | null;
   colorTheme?: ColorTheme;
 }
 
@@ -40,8 +40,9 @@ export function NoteIndicators({
         ? getScaleDegree(activeNote, selectedKey)
         : activeNote
 
-      const chordFunction = chordNotes?.get(activeNote) ?? null;
-      const resolvedColor = resolveChordColor(chordFunction, colorTheme);
+      const chordInfo = chordNotes?.get(activeNote) ?? null;
+      const chordFunction = chordInfo?.fn ?? null;
+      const resolvedColor = resolveChordColor(chordFunction, colorTheme, chordInfo?.isExtension);
       let fillColor: string;
       let strokeColor: string;
       let textColor = '#fff';
