@@ -2,6 +2,8 @@ import { useState } from 'react';
 import type { ChordDetectionResult, ChordName } from '../../types/chordTypes';
 import type { ColorTheme } from '../../types';
 import { resolveChordColor } from '../../utils/chordFunctionColors';
+import { getChordTones, noteNameToSemitone } from '../../utils/chordDetection';
+import { INTERVAL_TO_FUNCTION } from '../../utils/chordDictionary';
 
 interface ChordAnalyzerBadgeProps {
   detection: ChordDetectionResult | null;
@@ -35,6 +37,26 @@ export function ChordAnalyzerBadge({
 
   // Extensions: use activeExtensions from parent (handles both detected and override)
   const extensions = activeExtensions ?? layers.extensions;
+
+  // Chord tone degrees (e.g., "1 3 5 7") with function labels for coloring
+  const chordDegrees = (() => {
+    if (!displayedChord.quality) return [];
+    try {
+      const tones = getChordTones(displayedChord.root, displayedChord.quality);
+      const rootSemitone = noteNameToSemitone(displayedChord.root);
+      return tones.map(s => {
+        const interval = (s - rootSemitone + 12) % 12;
+        const fn = INTERVAL_TO_FUNCTION[interval];
+        if (!fn) return null;
+        // Convert function label to degree display: 'root'→'1', '3rd'→'3', '5th'→'5', etc.
+        const degree = fn === 'root' ? '1'
+          : fn.replace(/(st|nd|rd|th)$/, '');
+        return { degree, fn };
+      }).filter(Boolean) as { degree: string; fn: string }[];
+    } catch {
+      return [];
+    }
+  })();
 
   // Build the "Also" list: swap original primary in when overridden
   const alsoList = isOverridden
@@ -82,6 +104,20 @@ export function ChordAnalyzerBadge({
           </span>
         )}
       </div>
+
+      {chordDegrees.length > 0 && (
+        <div className="flex gap-2 mt-1">
+          {chordDegrees.map((d, i) => (
+            <span
+              key={i}
+              className="text-xs font-semibold"
+              style={{ color: resolveChordColor(d.fn, colorTheme) ?? '#888' }}
+            >
+              {d.degree}
+            </span>
+          ))}
+        </div>
+      )}
 
       {alsoList.length > 0 && (
         <div className="mt-2 pt-2 border-t border-gray-800 text-xs text-gray-500">
