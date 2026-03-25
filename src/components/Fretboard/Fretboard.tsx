@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import type { Copedent, NoteDisplayMode } from '../../types'
+import type { Copedent, NoteDisplayMode, ColorTheme } from '../../types'
 import type { VoicingResult } from '../../types/chordTypes'
 import { TOTAL_FRETS } from '../../utils/fretUtils'
 import { getFretX } from '../../utils/fretUtils'
@@ -20,6 +20,7 @@ interface FretboardProps {
   chordNotes?: Map<string, string> | null;
   finderResults?: VoicingResult[] | null;
   finderTargetChord?: { root: string; quality: string } | null;
+  colorTheme?: ColorTheme;
 }
 
 const LEFT_MARGIN = 50
@@ -29,7 +30,7 @@ const STRING_LABEL_WIDTH = 30
 const FRETBOARD_HEIGHT = 300
 const MIN_FRET_WIDTH = 28
 
-export function Fretboard({ copedent, engagedControls, displayMode, selectedKey, selectedFret = null, onFretClick, chordNotes = null, finderResults = null, finderTargetChord = null }: FretboardProps) {
+export function Fretboard({ copedent, engagedControls, displayMode, selectedKey, selectedFret = null, onFretClick, chordNotes = null, finderResults = null, finderTargetChord = null, colorTheme = 'chordTones' }: FretboardProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState(1200)
 
@@ -129,6 +130,7 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
             fretboardHeight={FRETBOARD_HEIGHT}
             leftMargin={LEFT_MARGIN}
             chordNotes={chordNotes}
+            colorTheme={colorTheme}
           />
 
           {/* Clickable fret regions — centered on each fret line */}
