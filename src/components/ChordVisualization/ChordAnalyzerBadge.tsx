@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { ChordDetectionResult } from '../../types/chordTypes';
+import type { ChordDetectionResult, ChordName } from '../../types/chordTypes';
 import type { ColorTheme } from '../../types';
 import { resolveChordColor } from '../../utils/chordFunctionColors';
 
@@ -8,6 +8,8 @@ interface ChordAnalyzerBadgeProps {
   fret: number | null;
   hasEngagedControls: boolean;
   colorTheme?: ColorTheme;
+  overrideChord?: ChordName | null;
+  onChordOverride?: (chord: ChordName | null) => void;
 }
 
 export function ChordAnalyzerBadge({
@@ -15,6 +17,8 @@ export function ChordAnalyzerBadge({
   fret,
   hasEngagedControls,
   colorTheme = 'chordTones',
+  overrideChord = null,
+  onChordOverride,
 }: ChordAnalyzerBadgeProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -22,6 +26,23 @@ export function ChordAnalyzerBadge({
 
   const fretLabel = fret == null || fret === 0 ? 'OPEN STRINGS' : `CHORD AT FRET ${fret}`;
   const { primary, layers, alternatives } = detection;
+
+  // Determine displayed chord: override wins over auto-detected
+  const displayedChord = overrideChord ?? primary;
+  const isOverridden = overrideChord !== null;
+
+  // Build the "Also" list: swap original primary in when overridden
+  const alsoList = isOverridden
+    ? [
+        { chord: primary, isDetected: true },
+        ...alternatives
+          .filter(alt => alt.display !== overrideChord.display)
+          .slice(0, 2)
+          .map(alt => ({ chord: alt as ChordName, isDetected: false })),
+      ]
+    : alternatives
+        .slice(0, 3)
+        .map(alt => ({ chord: alt as ChordName, isDetected: false }));
 
   return (
     <div
@@ -32,10 +53,20 @@ export function ChordAnalyzerBadge({
         {fretLabel}
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="text-lg font-bold" style={{ color: resolveChordColor('root', colorTheme) ?? '#00E5D0' }}>
-          {primary.display}
+        <span
+          className="text-lg font-bold"
+          style={{ color: resolveChordColor('root', colorTheme) ?? '#00E5D0' }}
+          onClick={isOverridden && onChordOverride ? (e) => {
+            e.stopPropagation();
+            onChordOverride(null);
+          } : undefined}
+        >
+          {displayedChord.display}
         </span>
-        {layers.extensions.length > 0 && (
+        {isOverridden && (
+          <span className="text-[10px] text-gray-500">(selected)</span>
+        )}
+        {!isOverridden && layers.extensions.length > 0 && (
           <span className="text-sm font-semibold flex gap-1.5">
             +
             {layers.extensions.map((e, i) => (
@@ -49,7 +80,7 @@ export function ChordAnalyzerBadge({
 
       {expanded && (
         <div className="mt-2 pt-2 border-t border-gray-800">
-          {layers.extensions.length > 0 && (
+          {!isOverridden && layers.extensions.length > 0 && (
             <div className="text-xs mb-1">
               <span className="text-gray-500">Extensions: </span>
               {layers.extensions.map((ext, i) => (
@@ -60,11 +91,30 @@ export function ChordAnalyzerBadge({
               ))}
             </div>
           )}
-          {alternatives.length > 0 && (
+          {alsoList.length > 0 && (
             <div className="text-xs text-gray-500">
               <div className="mb-1">Also:</div>
-              {alternatives.slice(0, 3).map((alt, i) => (
-                <div key={i} className="text-gray-400">{alt.display}</div>
+              {alsoList.map((item, i) => (
+                <div
+                  key={i}
+                  className="text-gray-400 hover:text-gray-200 cursor-pointer py-0.5"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onChordOverride) {
+                      if (item.isDetected) {
+                        onChordOverride(null);
+                      } else {
+                        const { root, quality, display } = item.chord;
+                        onChordOverride({ root, quality, display });
+                      }
+                    }
+                  }}
+                >
+                  {item.chord.display}
+                  {item.isDetected && (
+                    <span className="text-gray-600 ml-1">(detected)</span>
+                  )}
+                </div>
               ))}
             </div>
           )}
