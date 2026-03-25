@@ -1,4 +1,4 @@
-import { NOTE_NAMES } from './noteUtils';
+import { NOTE_NAMES, normalizeNoteName } from './noteUtils';
 import { CHORD_DICTIONARY, getIntervalLabel } from './chordDictionary';
 import type { ChordDetectionResult, ChordName, ChordLayers, ScoredChordName } from '../types/chordTypes';
 
@@ -159,6 +159,68 @@ function buildLayers(primary: ChordName, pitchClasses: number[]): ChordLayers {
   }
 
   return { core: primary.display, extensions };
+}
+
+const QUALITY_ALIASES: Record<string, string> = {
+  '': 'maj',
+  'M': 'maj',
+  'm': 'min',
+  'mi': 'min',
+  '-': 'min',
+  'Δ': 'maj7',
+  'Δ7': 'maj7',
+  'M7': 'maj7',
+  'm7': 'min7',
+  'mi7': 'min7',
+  '-7': 'min7',
+  'ø': 'm7b5',
+  'ø7': 'm7b5',
+  'o': 'dim',
+  'o7': 'dim7',
+  '+': 'aug',
+  '+7': 'aug7',
+  'mM7': 'min7',
+};
+
+export function parseChordName(input: string): { root: string; quality: string } | null {
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+
+  const rootMatch = trimmed.match(/^([A-G][#b]?)(.*)/);
+  if (!rootMatch) return null;
+
+  let root = rootMatch[1];
+  let qualityStr = rootMatch[2];
+
+  // Normalize flat roots to sharps
+  if (root.includes('b') && root.length === 2) {
+    root = normalizeNoteName(root);
+  }
+
+  // Verify root is a valid note
+  if (!NOTE_NAMES.includes(root as typeof NOTE_NAMES[number])) {
+    return null;
+  }
+
+  // Resolve quality aliases
+  if (QUALITY_ALIASES[qualityStr] !== undefined) {
+    qualityStr = QUALITY_ALIASES[qualityStr];
+  }
+
+  // Handle 'm' prefix for minor variants (m7, m9, etc.)
+  if (qualityStr.startsWith('m') && qualityStr !== 'maj' && !qualityStr.startsWith('maj') && !qualityStr.startsWith('min')) {
+    qualityStr = 'min' + qualityStr.slice(1);
+  }
+
+  // Verify quality exists in dictionary
+  const validQuality = CHORD_DICTIONARY.some(c => c.quality === qualityStr);
+  if (!validQuality && qualityStr !== '') {
+    return null;
+  }
+
+  if (qualityStr === '') qualityStr = 'maj';
+
+  return { root, quality: qualityStr };
 }
 
 /**

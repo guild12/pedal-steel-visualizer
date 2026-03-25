@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { detectChord } from './chordDetection';
+import { detectChord, parseChordName } from './chordDetection';
 
 describe('detectChord', () => {
   it('detects a C major triad', () => {
@@ -72,5 +72,47 @@ describe('detectChord', () => {
     const result = detectChord(['C', 'F', 'G']);
     expect(result.primary.root).toBe('C');
     expect(result.primary.quality).toBe('sus4');
+  });
+});
+
+describe('parseChordName', () => {
+  it('parses simple major chord', () => {
+    const result = parseChordName('Cmaj');
+    expect(result).toEqual({ root: 'C', quality: 'maj' });
+  });
+
+  it('parses sharp root', () => {
+    const result = parseChordName('F#min7');
+    expect(result).toEqual({ root: 'F#', quality: 'min7' });
+  });
+
+  it('parses dominant 7', () => {
+    const result = parseChordName('G7');
+    expect(result).toEqual({ root: 'G', quality: '7' });
+  });
+
+  it('parses complex chord', () => {
+    const result = parseChordName('Cmaj9');
+    expect(result).toEqual({ root: 'C', quality: 'maj9' });
+  });
+
+  it('parses flat root as sharp equivalent', () => {
+    const result = parseChordName('Bbmaj7');
+    expect(result).toEqual({ root: 'A#', quality: 'maj7' });
+  });
+
+  it('parses just a root note as major', () => {
+    const result = parseChordName('C');
+    expect(result).toEqual({ root: 'C', quality: 'maj' });
+  });
+
+  it('parses m as min shorthand', () => {
+    const result = parseChordName('Am');
+    expect(result).toEqual({ root: 'A', quality: 'min' });
+  });
+
+  it('returns null for invalid input', () => {
+    expect(parseChordName('')).toBeNull();
+    expect(parseChordName('xyz')).toBeNull();
   });
 });
