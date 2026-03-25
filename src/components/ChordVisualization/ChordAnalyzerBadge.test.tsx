@@ -55,12 +55,10 @@ describe('ChordAnalyzerBadge', () => {
     expect(getByText(/9/)).toBeTruthy();
   });
 
-  it('expands on click to show alternatives', () => {
-    const { getByText, queryByText } = render(
+  it('shows alternatives always visible', () => {
+    const { getByText } = render(
       <ChordAnalyzerBadge detection={mockDetection} fret={0} hasEngagedControls={false} />
     );
-    expect(queryByText('C#min')).toBeFalsy();
-    fireEvent.click(getByText('Emaj'));
     expect(getByText('C#min')).toBeTruthy();
   });
 
@@ -74,7 +72,6 @@ describe('ChordAnalyzerBadge', () => {
         onChordOverride={onOverride}
       />
     );
-    fireEvent.click(getByText('Emaj'));
     fireEvent.click(getByText('C#min'));
     expect(onOverride).toHaveBeenCalledWith({
       root: 'C#', quality: 'min', display: 'C#min',
@@ -115,13 +112,12 @@ describe('ChordAnalyzerBadge', () => {
         onChordOverride={vi.fn()}
       />
     );
-    fireEvent.click(getByText('CHORD AT FRET 3'));
     expect(getByText('(detected)')).toBeTruthy();
     expect(getByText('Emaj')).toBeTruthy();
   });
 
-  it('badge expands when clicking non-chord-name area with override active', () => {
-    const { getByText, queryByText } = render(
+  it('shows original primary in Also list when override active', () => {
+    const { getByText } = render(
       <ChordAnalyzerBadge
         detection={mockDetection}
         fret={3}
@@ -130,8 +126,6 @@ describe('ChordAnalyzerBadge', () => {
         onChordOverride={vi.fn()}
       />
     );
-    expect(queryByText('Also:')).toBeFalsy();
-    fireEvent.click(getByText('CHORD AT FRET 3'));
     expect(getByText('Emaj')).toBeTruthy();
   });
 

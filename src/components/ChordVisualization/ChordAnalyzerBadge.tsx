@@ -83,46 +83,45 @@ export function ChordAnalyzerBadge({
         )}
       </div>
 
-      {expanded && (
+      {alsoList.length > 0 && (
+        <div className="mt-2 pt-2 border-t border-gray-800 text-xs text-gray-500">
+          <div className="mb-1">Also:</div>
+          {alsoList.map((item, i) => (
+            <div
+              key={i}
+              className="text-gray-400 hover:text-gray-200 cursor-pointer py-0.5"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onChordOverride) {
+                  if (item.isDetected) {
+                    onChordOverride(null);
+                  } else {
+                    const { root, quality, display } = item.chord;
+                    onChordOverride({ root, quality, display });
+                  }
+                }
+              }}
+            >
+              {item.chord.display}
+              {item.isDetected && (
+                <span className="text-gray-600 ml-1">(detected)</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {expanded && extensions.length > 0 && (
         <div className="mt-2 pt-2 border-t border-gray-800">
-          {extensions.length > 0 && (
-            <div className="text-xs mb-1">
-              <span className="text-gray-500">Extensions: </span>
-              {extensions.map((ext, i) => (
-                <span key={i}>
-                  {i > 0 && <span className="text-gray-600">, </span>}
-                  <span style={{ color: resolveChordColor(ext.split(' ')[0], colorTheme) ?? '#F4A261' }}>{ext}</span>
-                </span>
-              ))}
-            </div>
-          )}
-          {alsoList.length > 0 && (
-            <div className="text-xs text-gray-500">
-              <div className="mb-1">Also:</div>
-              {alsoList.map((item, i) => (
-                <div
-                  key={i}
-                  className="text-gray-400 hover:text-gray-200 cursor-pointer py-0.5"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (onChordOverride) {
-                      if (item.isDetected) {
-                        onChordOverride(null);
-                      } else {
-                        const { root, quality, display } = item.chord;
-                        onChordOverride({ root, quality, display });
-                      }
-                    }
-                  }}
-                >
-                  {item.chord.display}
-                  {item.isDetected && (
-                    <span className="text-gray-600 ml-1">(detected)</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="text-xs mb-1">
+            <span className="text-gray-500">Extensions: </span>
+            {extensions.map((ext, i) => (
+              <span key={i}>
+                {i > 0 && <span className="text-gray-600">, </span>}
+                <span style={{ color: resolveChordColor(ext.split(' ')[0], colorTheme) ?? '#F4A261' }}>{ext}</span>
+              </span>
+            ))}
+          </div>
         </div>
       )}
     </div>
