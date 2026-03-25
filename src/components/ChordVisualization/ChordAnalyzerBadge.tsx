@@ -97,7 +97,7 @@ export function ChordAnalyzerBadge({
           <span className="text-sm font-semibold flex gap-1.5">
             +
             {extensions.map((e, i) => (
-              <span key={i} style={{ color: resolveChordColor(e.split(' ')[0], colorTheme) ?? '#F4A261' }}>
+              <span key={i} style={{ color: resolveChordColor(e.split(' ')[0], colorTheme, true) ?? '#F4A261' }}>
                 {e.split(' ')[0]}
               </span>
             ))}
@@ -154,7 +154,7 @@ export function ChordAnalyzerBadge({
             {extensions.map((ext, i) => (
               <span key={i}>
                 {i > 0 && <span className="text-gray-600">, </span>}
-                <span style={{ color: resolveChordColor(ext.split(' ')[0], colorTheme) ?? '#F4A261' }}>{ext}</span>
+                <span style={{ color: resolveChordColor(ext.split(' ')[0], colorTheme, true) ?? '#F4A261' }}>{ext}</span>
               </span>
             ))}
           </div>
