@@ -1,0 +1,47 @@
+{
+  "name": "SGF #5473 S14",
+  "pedals": ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"],
+  "kneeLevers": ["LKL", "LKV", "LKR", "RKL", "RKR"],
+  "strings": [
+    { "number": 1, "openNote": "G#4", "changes": [] },
+    { "number": 2, "openNote": "F#4", "changes": [
+      { "control": "LKV", "semitones": 1 },
+      { "control": "P5", "semitones": 1 }
+    ]},
+    { "number": 3, "openNote": "D#4", "changes": [
+      { "control": "RKR", "semitones": -1 }
+    ]},
+    { "number": 4, "openNote": "G#4", "changes": [
+      { "control": "LKL", "semitones": -3 },
+      { "control": "P2", "semitones": 1 }
+    ]},
+    { "number": 5, "openNote": "E4", "changes": [
+      { "control": "LKR", "semitones": -1 },
+      { "control": "P3", "semitones": 2 },
+      { "control": "P6", "semitones": 0 },
+      { "control": "P7", "semitones": -3 }
+    ]},
+    { "number": 6, "openNote": "B3", "changes": [
+      { "control": "P2", "semitones": 2 },
+      { "control": "P3", "semitones": 2 }
+    ]},
+    { "number": 7, "openNote": "G#3", "changes": [
+      { "control": "P2", "semitones": 1 },
+      { "control": "P3", "semitones": 2 },
+      { "control": "P6", "semitones": 2 }
+    ]},
+    { "number": 8, "openNote": "F#3", "changes": [] },
+    { "number": 9, "openNote": "E3", "changes": [
+      { "control": "LKL", "semitones": 1 },
+      { "control": "LKR", "semitones": -1 }
+    ]},
+    { "number": 10, "openNote": "B2", "changes": [] },
+    { "number": 11, "openNote": "G#2", "changes": [
+      { "control": "P2", "semitones": 1 },
+      { "control": "P4", "semitones": 2 }
+    ]},
+    { "number": 12, "openNote": "E2", "changes": [] },
+    { "number": 13, "openNote": "B1", "changes": [] },
+    { "number": 14, "openNote": "E1", "changes": [] }
+  ]
+}

@@ -12,10 +12,13 @@ export function ImportExport({ copedent, onUpdate }: ImportExportProps) {
 
   const handleExport = () => {
     const json = JSON.stringify(copedent, null, 2)
-    navigator.clipboard.writeText(json).catch(() => {
-      // Fallback: show in textarea
-      setImportText(json)
-    })
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${copedent.name.replace(/[^a-zA-Z0-9]/g, '-')}.json`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   const handleImport = () => {
