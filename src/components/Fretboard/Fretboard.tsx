@@ -1,17 +1,25 @@
 import React, { useRef, useState, useEffect } from 'react'
 import type { Copedent, NoteDisplayMode } from '../../types'
+import type { VoicingResult } from '../../types/chordTypes'
 import { TOTAL_FRETS } from '../../utils/fretUtils'
 import { getFretX } from '../../utils/fretUtils'
 import { FretLines } from './FretLines'
 import { StringLines } from './StringLines'
 import { NoteIndicators } from './NoteIndicators'
 import { FretMarkers } from './FretMarkers'
+import { ChordFinderOverlay } from '../ChordVisualization/ChordFinderOverlay'
 
 interface FretboardProps {
   copedent: Copedent;
   engagedControls: Set<string>;
   displayMode: NoteDisplayMode;
   selectedKey: string;
+  // New chord props
+  selectedFret?: number | null;
+  onFretClick?: (fret: number) => void;
+  chordNotes?: Map<string, string> | null;
+  finderResults?: VoicingResult[] | null;
+  finderTargetChord?: { root: string; quality: string } | null;
 }
 
 const LEFT_MARGIN = 50
@@ -21,7 +29,7 @@ const STRING_LABEL_WIDTH = 30
 const FRETBOARD_HEIGHT = 300
 const MIN_FRET_WIDTH = 28
 
-export function Fretboard({ copedent, engagedControls, displayMode, selectedKey }: FretboardProps) {
+export function Fretboard({ copedent, engagedControls, displayMode, selectedKey, selectedFret = null, onFretClick, chordNotes = null, finderResults = null, finderTargetChord = null }: FretboardProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState(1200)
 
@@ -126,7 +134,55 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey 
             fretboardWidth={fretboardWidth}
             fretboardHeight={FRETBOARD_HEIGHT}
             leftMargin={LEFT_MARGIN}
+            chordNotes={chordNotes}
           />
+
+          {/* Clickable fret regions — invisible rects for click targets */}
+          {Array.from({ length: 12 }, (_, fret) => {
+            const x1 = fret === 0 ? 0 : getFretX(fret, fretboardWidth);
+            const x2 = getFretX(fret + 1, fretboardWidth);
+            return (
+              <rect
+                key={`fret-click-${fret}`}
+                x={LEFT_MARGIN + x1}
+                y={0}
+                width={x2 - x1}
+                height={FRETBOARD_HEIGHT}
+                fill="transparent"
+                className="cursor-pointer"
+                onClick={() => onFretClick?.(fret)}
+              />
+            );
+          })}
+
+          {/* Selected fret highlight */}
+          {selectedFret != null && (
+            <rect
+              x={LEFT_MARGIN + (selectedFret === 0 ? 0 : getFretX(selectedFret, fretboardWidth))}
+              y={0}
+              width={getFretX(selectedFret + 1, fretboardWidth) - (selectedFret === 0 ? 0 : getFretX(selectedFret, fretboardWidth))}
+              height={FRETBOARD_HEIGHT}
+              rx={4}
+              fill="#00E5D0"
+              fillOpacity={0.08}
+              stroke="#00E5D0"
+              strokeOpacity={0.4}
+              strokeWidth={2}
+              strokeDasharray="4,3"
+              pointerEvents="none"
+            />
+          )}
+
+          {/* Chord finder overlay */}
+          {finderResults && finderResults.length > 0 && finderTargetChord && (
+            <ChordFinderOverlay
+              results={finderResults}
+              fretboardWidth={fretboardWidth}
+              fretboardHeight={FRETBOARD_HEIGHT}
+              leftMargin={LEFT_MARGIN}
+              targetChord={finderTargetChord}
+            />
+          )}
         </g>
       </svg>
     </div>
