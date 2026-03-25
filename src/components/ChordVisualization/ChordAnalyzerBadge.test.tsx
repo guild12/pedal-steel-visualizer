@@ -32,12 +32,20 @@ describe('ChordAnalyzerBadge', () => {
     expect(getByText(/OPEN STRINGS/)).toBeTruthy();
   });
 
-  it('uses red border when controls are engaged', () => {
+  it('renders chord name in root color (cyan) with default theme', () => {
     const { container } = render(
       <ChordAnalyzerBadge detection={mockDetection} fret={0} hasEngagedControls={true} />
     );
-    const badge = container.firstElementChild;
-    expect(badge?.className).toContain('border-red');
+    const chordName = container.querySelector('span[style]');
+    expect(chordName?.getAttribute('style')).toContain('rgb(0, 229, 208)');
+  });
+
+  it('renders chord name in cyan with rootFocus theme', () => {
+    const { container } = render(
+      <ChordAnalyzerBadge detection={mockDetection} fret={0} hasEngagedControls={true} colorTheme="rootFocus" />
+    );
+    const chordName = container.querySelector('span[style]');
+    expect(chordName?.getAttribute('style')).toContain('rgb(0, 229, 208)');
   });
 
   it('shows extensions when present', () => {
