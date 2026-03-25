@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import type { Copedent, NoteDisplayMode } from '../types'
+import type { Copedent, NoteDisplayMode, ColorTheme } from '../types'
 import { loadCopedents, saveCopedents } from '../utils/storage'
 
 export function useCopedentState() {
@@ -8,11 +8,21 @@ export function useCopedentState() {
   const [engagedControls, setEngagedControls] = useState<Set<string>>(new Set())
   const [displayMode, setDisplayMode] = useState<NoteDisplayMode>('letters')
   const [selectedKey, setSelectedKey] = useState('C')
+  const [colorTheme, setColorTheme] = useState<ColorTheme>(() => {
+    const saved = localStorage.getItem('psv-colorTheme')
+    return (saved === 'chordTones' || saved === 'rootFocus' || saved === 'perFunction')
+      ? saved
+      : 'chordTones'
+  })
 
   // Persist on change
   useEffect(() => {
     saveCopedents(copedents)
   }, [copedents])
+
+  useEffect(() => {
+    localStorage.setItem('psv-colorTheme', colorTheme)
+  }, [colorTheme])
 
   const activeCopedent = copedents.find(c => c.id === activeCopedentId) ?? copedents[0]
 
@@ -76,11 +86,13 @@ export function useCopedentState() {
     engagedControls,
     displayMode,
     selectedKey,
+    colorTheme,
     setActiveCopedentId: switchCopedent,
     toggleControl,
     clearAllControls,
     setDisplayMode,
     setSelectedKey,
+    setColorTheme,
     updateCopedent,
     duplicateCopedent,
     deleteCopedent,
