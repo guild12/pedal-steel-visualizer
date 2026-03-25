@@ -7,7 +7,7 @@ interface ChordDetailPopoverProps {
 }
 
 export function ChordDetailPopover({ detection, x, y }: ChordDetailPopoverProps) {
-  const { primary, layers, alternatives } = detection;
+  const { layers, alternatives } = detection;
 
   return (
     <foreignObject x={x - 180} y={y} width={360} height={80}>

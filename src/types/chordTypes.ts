@@ -1,3 +1,31 @@
+// src/types/chordTypes.ts
+
+export interface ChordName {
+  root: string;
+  quality: string;
+  display: string;
+}
+
+export interface ScoredChordName extends ChordName {
+  score: number;
+}
+
+export interface ChordLayers {
+  core: string;
+  extensions: string[];
+}
+
+export interface ChordDetectionResult {
+  primary: ChordName;
+  layers: ChordLayers;
+  alternatives: ScoredChordName[];
+}
+
+export interface ChordDefinition {
+  quality: string;
+  intervals: number[];
+}
+
 export interface VoicingNote {
   stringNumber: number;
   note: string;
@@ -38,23 +66,22 @@ export interface TransitionResult {
   effort: TransitionEffort;
 }
 
-export interface ChordQuality {
-  root: string;
-  quality: string;
-  display: string;
+export interface ChordFinderState {
+  active: boolean;
+  targetChord: { root: string; quality: string } | null;
+  results: VoicingResult[];
 }
 
-export interface ChordAlternative extends ChordQuality {
-  score: number;
+export interface ChordTransitionState {
+  active: boolean;
+  chordA: { root: string; quality: string } | null;
+  chordB: { root: string; quality: string } | null;
+  results: TransitionResult[];
+  selectedResultIndex: number | null;
 }
 
-export interface ChordLayers {
-  core: string;
-  extensions: string[];
-}
-
-export interface ChordDetectionResult {
-  primary: ChordQuality;
-  layers: ChordLayers;
-  alternatives: ChordAlternative[];
+export interface ChordState {
+  selectedFret: number | null;
+  chordFinder: ChordFinderState | null;
+  chordTransition: ChordTransitionState | null;
 }

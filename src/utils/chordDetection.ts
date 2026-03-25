@@ -49,16 +49,15 @@ export function detectChord(notes: string[]): ChordDetectionResult {
 
     // Try each chord quality
     for (const chord of CHORD_DICTIONARY) {
-      const chordIntervalsMod12 = chord.intervals.map(i => i % 12);
-      const matchedIntervals = chordIntervalsMod12.filter(ci => intervals.includes(ci));
+      const chordIntervalsMod12 = chord.intervals.map((iv: number) => iv % 12);
+      const matchedIntervals = chordIntervalsMod12.filter((ci: number) => intervals.includes(ci));
       const matchCount = matchedIntervals.length;
 
       if (matchCount < 2) continue; // Need at least 2 matching intervals
 
       const hasRoot = intervals.includes(0);
       const totalChordTones = chordIntervalsMod12.length;
-      const matchRatio = matchCount / totalChordTones;
-      const extraNotes = intervals.filter(i => !chordIntervalsMod12.includes(i)).length;
+      const extraNotes = intervals.filter((iv: number) => !chordIntervalsMod12.includes(iv)).length;
 
       const missingTones = totalChordTones - matchCount;
 
@@ -147,7 +146,7 @@ function buildLayers(primary: ChordName, pitchClasses: number[]): ChordLayers {
     return { core: primary.display, extensions: [] };
   }
 
-  const chordIntervalsMod12 = chordDef.intervals.map(i => i % 12);
+  const chordIntervalsMod12 = chordDef.intervals.map((iv: number) => iv % 12);
   const extensions: string[] = [];
 
   for (const interval of intervals) {
@@ -230,5 +229,5 @@ export function getChordTones(root: string, quality: string): number[] {
   const rootSemitone = noteNameToSemitone(root);
   const chordDef = CHORD_DICTIONARY.find(c => c.quality === quality);
   if (!chordDef) return [rootSemitone];
-  return chordDef.intervals.map(i => (rootSemitone + i) % 12);
+  return chordDef.intervals.map((iv: number) => (rootSemitone + iv) % 12);
 }

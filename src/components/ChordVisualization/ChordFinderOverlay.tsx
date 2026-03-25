@@ -14,7 +14,6 @@ export function ChordFinderOverlay({
   fretboardWidth,
   fretboardHeight,
   leftMargin,
-  targetChord,
 }: ChordFinderOverlayProps) {
   const byFret = new Map<number, VoicingResult>();
   for (const r of results) {
