@@ -12,6 +12,8 @@ const defaultProps = {
   onDelete: vi.fn(),
   onCreateNew: vi.fn(),
   onOpenEditor: vi.fn(),
+  onSaveToFile: vi.fn(),
+  onLoadFromFile: vi.fn(),
 }
 
 describe('CopedentManager', () => {
@@ -27,6 +29,8 @@ describe('CopedentManager', () => {
     expect(screen.getByRole('button', { name: /duplicate/i })).toBeTruthy()
     expect(screen.getByRole('button', { name: /delete/i })).toBeTruthy()
     expect(screen.getByRole('button', { name: /edit/i })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /save/i })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /load/i })).toBeTruthy()
   })
 
   it('calls onDuplicate with active copedent id', async () => {
