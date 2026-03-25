@@ -15,12 +15,16 @@ import { ChordPicker } from './components/ChordVisualization/ChordPicker'
 import { TransitionPicker } from './components/ChordVisualization/TransitionPicker'
 import { TransitionResults } from './components/ChordVisualization/TransitionResults'
 import type { Copedent } from './types'
+import type { ChordName } from './types/chordTypes'
 
 function App() {
   const state = useCopedentState()
   const [editorOpen, setEditorOpen] = useState(false)
 
   const chordState = useChordState();
+
+  // Override chord selection — when user clicks an alternative in the badge
+  const [overrideChord, setOverrideChord] = useState<ChordName | null>(null);
 
   // Compute chord detection for current fret + controls
   const currentDetection = useMemo(() => {
@@ -31,16 +35,23 @@ function App() {
     return detectChord(notes);
   }, [chordState.selectedFret, state.engagedControls, state.activeCopedent]);
 
+  // Auto-reset override when detection changes (fret change, pedal toggle, etc.)
+  useEffect(() => {
+    setOverrideChord(null);
+  }, [currentDetection]);
+
+  // Active chord: override wins over auto-detected
+  const activeChord = overrideChord ?? currentDetection?.primary ?? null;
+
   // Compute chord notes map for coloring (pitch class → function label)
-  // Function labels: 'root', '3rd', 'b3', '5th', '7th', '9', etc.
   const chordNotesMap = useMemo(() => {
-    if (!currentDetection || chordState.selectedFret == null) return null;
+    if (!activeChord || chordState.selectedFret == null) return null;
     const map = new Map<string, string>();
-    const rootSemitone = NOTE_NAMES.indexOf(currentDetection.primary.root as typeof NOTE_NAMES[number]);
+    const rootSemitone = NOTE_NAMES.indexOf(activeChord.root as typeof NOTE_NAMES[number]);
     if (rootSemitone === -1) return null;
 
     // Core chord tones — compute relative interval from root to get function label
-    const tones = getChordTones(currentDetection.primary.root, currentDetection.primary.quality);
+    const tones = getChordTones(activeChord.root, activeChord.quality);
     for (const semitone of tones) {
       const interval = (semitone - rootSemitone + 12) % 12;
       const fn = INTERVAL_TO_FUNCTION[interval];
@@ -49,16 +60,18 @@ function App() {
       }
     }
 
-    // Extension tones — use the interval prefix as function label
-    for (const ext of currentDetection.layers.extensions) {
-      const match = ext.match(/^([b#]?\d+)\s+\(([A-G]#?)\)/);
-      if (match) {
-        map.set(match[2], match[1]);
+    // Extension tones — only when showing the detected primary (not an override)
+    if (!overrideChord && currentDetection) {
+      for (const ext of currentDetection.layers.extensions) {
+        const match = ext.match(/^([b#]?\d+)\s+\(([A-G]#?)\)/);
+        if (match) {
+          map.set(match[2], match[1]);
+        }
       }
     }
 
     return map;
-  }, [currentDetection, chordState.selectedFret]);
+  }, [activeChord, overrideChord, currentDetection, chordState.selectedFret]);
 
   // Compute voicing search results for chord finder
   const finderResults = useMemo(() => {
@@ -179,6 +192,8 @@ function App() {
           fret={chordState.selectedFret}
           hasEngagedControls={state.engagedControls.size > 0}
           colorTheme={state.colorTheme}
+          overrideChord={overrideChord}
+          onChordOverride={setOverrideChord}
         />
 
         {/* Transition Results (below fretboard) */}
