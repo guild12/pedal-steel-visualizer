@@ -12,11 +12,18 @@ interface ControlPanelProps {
   selectedKey: string;
   onDisplayModeChange: (mode: NoteDisplayMode) => void;
   onSelectedKeyChange: (key: string) => void;
+  // New chord props
+  onChordFinderToggle?: () => void;
+  onTransitionToggle?: () => void;
+  chordFinderActive?: boolean;
+  transitionActive?: boolean;
 }
 
 export function ControlPanel({
   pedals, kneeLevers, engagedControls, onToggleControl, onClearAll,
   displayMode, selectedKey, onDisplayModeChange, onSelectedKeyChange,
+  onChordFinderToggle, onTransitionToggle,
+  chordFinderActive = false, transitionActive = false,
 }: ControlPanelProps) {
   return (
     <div className="space-y-4">
@@ -54,12 +61,30 @@ export function ControlPanel({
 
       {/* Clear All + Display Options */}
       <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-gray-800">
-        <button
-          onClick={onClearAll}
-          className="px-3 py-1 text-sm bg-gray-800 text-gray-400 rounded hover:text-white hover:bg-gray-700 transition-colors"
-        >
-          Clear All
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={onClearAll}
+            className="px-3 py-1 text-sm bg-gray-800 text-gray-400 rounded hover:text-white hover:bg-gray-700 transition-colors"
+          >
+            Clear All
+          </button>
+          <button
+            onClick={onChordFinderToggle}
+            className={`px-3 py-1 rounded text-sm ${
+              chordFinderActive ? 'bg-cyan-400 text-gray-950' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+            }`}
+          >
+            Chord Finder
+          </button>
+          <button
+            onClick={onTransitionToggle}
+            className={`px-3 py-1 rounded text-sm ${
+              transitionActive ? 'bg-cyan-400 text-gray-950' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+            }`}
+          >
+            Transitions
+          </button>
+        </div>
         <DisplayOptions
           displayMode={displayMode}
           selectedKey={selectedKey}
