@@ -1,0 +1,296 @@
+<h2>Chord Tone Color Palette</h2>
+<p class="subtitle">How should chord tones be colored on the fretboard? Compare three approaches.</p>
+
+<style>
+  .fretboard-mock {
+    background: #111827;
+    border-radius: 8px;
+    padding: 20px 16px;
+    margin: 12px 0;
+    overflow-x: auto;
+  }
+  .fretboard-mock svg {
+    display: block;
+    margin: 0 auto;
+  }
+  .palette-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+    padding: 0 4px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #cbd5e1;
+  }
+  .legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .option .content { padding-bottom: 4px; }
+  .trade-note {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+</style>
+
+<!-- Option A: Current 2-color -->
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>2-Color (Current)</h3>
+      <p>Core tones = cyan, Extensions = orange. Simple and clean.</p>
+      <div class="fretboard-mock">
+        <svg width="520" height="120" viewBox="0 0 520 120">
+          <!-- Fret lines -->
+          <line x1="40" y1="10" x2="40" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="100" y1="10" x2="100" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="160" y1="10" x2="160" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="220" y1="10" x2="220" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="280" y1="10" x2="280" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="340" y1="10" x2="340" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="400" y1="10" x2="400" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="460" y1="10" x2="460" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <!-- String lines -->
+          <line x1="10" y1="20" x2="510" y2="20" stroke="#6b7280" stroke-width="1"/>
+          <line x1="10" y1="38" x2="510" y2="38" stroke="#6b7280" stroke-width="1"/>
+          <line x1="10" y1="56" x2="510" y2="56" stroke="#6b7280" stroke-width="1.2"/>
+          <line x1="10" y1="74" x2="510" y2="74" stroke="#6b7280" stroke-width="1.4"/>
+          <line x1="10" y1="92" x2="510" y2="92" stroke="#6b7280" stroke-width="1.6"/>
+
+          <!-- C6 chord at fret 5: C(root), E(3rd), G(5th), A(6th), D(9th) -->
+          <!-- Non-chord notes: gray -->
+          <circle cx="40" cy="20" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="40" y="20" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">F#</text>
+
+          <circle cx="40" cy="92" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="40" y="92" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">B</text>
+
+          <!-- Core tones: all cyan -->
+          <circle cx="100" cy="20" r="11" fill="#00E5D0" stroke="#00E5D0" stroke-width="2"/>
+          <text x="100" y="20" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">C</text>
+
+          <circle cx="100" cy="38" r="11" fill="#00E5D0" stroke="#00E5D0" stroke-width="2"/>
+          <text x="100" y="38" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">E</text>
+
+          <circle cx="160" cy="56" r="11" fill="#00E5D0" stroke="#00E5D0" stroke-width="2"/>
+          <text x="160" y="56" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">G</text>
+
+          <circle cx="220" cy="74" r="11" fill="#00E5D0" stroke="#00E5D0" stroke-width="2"/>
+          <text x="220" y="74" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">A</text>
+
+          <circle cx="160" cy="92" r="11" fill="#00E5D0" stroke="#00E5D0" stroke-width="2"/>
+          <text x="160" y="92" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">C</text>
+
+          <!-- Extension: orange -->
+          <circle cx="280" cy="38" r="11" fill="#F4A261" stroke="#F4A261" stroke-width="2"/>
+          <text x="280" y="38" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">D</text>
+
+          <!-- More non-chord -->
+          <circle cx="220" cy="20" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="220" y="20" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">D</text>
+
+          <circle cx="160" cy="38" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="160" y="38" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">F</text>
+
+          <circle cx="100" cy="56" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="100" y="56" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">F</text>
+
+          <circle cx="100" cy="74" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="100" y="74" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">F#</text>
+
+          <circle cx="100" cy="92" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="100" y="92" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">A</text>
+        </svg>
+      </div>
+      <div class="palette-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#00E5D0"></div>Core (R, 3, 5, 6)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#F4A261"></div>Extension (9, 11, etc.)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1f2937; border: 1px solid #4b5563"></div>Non-chord</div>
+      </div>
+      <div class="trade-note">
+        <strong>Pro:</strong> Instantly see "in the chord" vs "not in the chord." Clean, minimal.<br/>
+        <strong>Con:</strong> Can't tell root from 5th. Useful for guitarists, less so for steel players who think in chord functions.
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B: 5-color per function -->
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>5-Color Per Function</h3>
+      <p>Each chord degree gets its own color. Root, 3rd, 5th, 7th, Extensions all distinct.</p>
+      <div class="fretboard-mock">
+        <svg width="520" height="120" viewBox="0 0 520 120">
+          <!-- Fret lines -->
+          <line x1="40" y1="10" x2="40" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="100" y1="10" x2="100" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="160" y1="10" x2="160" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="220" y1="10" x2="220" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="280" y1="10" x2="280" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="340" y1="10" x2="340" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="400" y1="10" x2="400" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="460" y1="10" x2="460" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <!-- String lines -->
+          <line x1="10" y1="20" x2="510" y2="20" stroke="#6b7280" stroke-width="1"/>
+          <line x1="10" y1="38" x2="510" y2="38" stroke="#6b7280" stroke-width="1"/>
+          <line x1="10" y1="56" x2="510" y2="56" stroke="#6b7280" stroke-width="1.2"/>
+          <line x1="10" y1="74" x2="510" y2="74" stroke="#6b7280" stroke-width="1.4"/>
+          <line x1="10" y1="92" x2="510" y2="92" stroke="#6b7280" stroke-width="1.6"/>
+
+          <!-- C6 chord: C=root(cyan), E=3rd(red), G=5th(periwinkle), A=6th(orange), D=9th(purple) -->
+          <!-- Non-chord: gray -->
+          <circle cx="40" cy="20" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="40" y="20" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">F#</text>
+
+          <circle cx="40" cy="92" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="40" y="92" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">B</text>
+
+          <!-- Root: cyan -->
+          <circle cx="100" cy="20" r="11" fill="#00E5D0" stroke="#00E5D0" stroke-width="2"/>
+          <text x="100" y="20" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">C</text>
+
+          <circle cx="160" cy="92" r="11" fill="#00E5D0" stroke="#00E5D0" stroke-width="2"/>
+          <text x="160" y="92" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">C</text>
+
+          <!-- 3rd: red -->
+          <circle cx="100" cy="38" r="11" fill="#e63946" stroke="#e63946" stroke-width="2"/>
+          <text x="100" y="38" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">E</text>
+
+          <!-- 5th: periwinkle -->
+          <circle cx="160" cy="56" r="11" fill="#7B8CDE" stroke="#7B8CDE" stroke-width="2"/>
+          <text x="160" y="56" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">G</text>
+
+          <!-- 6th: orange -->
+          <circle cx="220" cy="74" r="11" fill="#F4A261" stroke="#F4A261" stroke-width="2"/>
+          <text x="220" y="74" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">A</text>
+
+          <circle cx="100" cy="92" r="11" fill="#F4A261" stroke="#F4A261" stroke-width="2"/>
+          <text x="100" y="92" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">A</text>
+
+          <!-- 9th: purple -->
+          <circle cx="280" cy="38" r="11" fill="#9b59b6" stroke="#9b59b6" stroke-width="2"/>
+          <text x="280" y="38" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">D</text>
+
+          <!-- Non-chord -->
+          <circle cx="220" cy="20" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="220" y="20" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">D</text>
+
+          <circle cx="160" cy="38" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="160" y="38" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">F</text>
+
+          <circle cx="100" cy="56" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="100" y="56" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">F</text>
+
+          <circle cx="100" cy="74" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="100" y="74" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">F#</text>
+        </svg>
+      </div>
+      <div class="palette-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#00E5D0"></div>Root</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e63946"></div>3rd</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#7B8CDE"></div>5th</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#F4A261"></div>6th / 7th</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div>Extensions</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1f2937; border: 1px solid #4b5563"></div>Non-chord</div>
+      </div>
+      <div class="trade-note">
+        <strong>Pro:</strong> See exactly what function each note plays. Root pops, 3rd shows major/minor at a glance. Already defined in chordFunctionColors.ts.<br/>
+        <strong>Con:</strong> 5 colors + gray = 6 things to track. Red for 3rd conflicts with red for pedal-changed notes. Could feel busy on dense chords.
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C: 3-color hybrid -->
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>3-Color Hybrid (Recommended)</h3>
+      <p>Root gets its own color. Core chord tones share a color. Extensions share a third. Best of both worlds.</p>
+      <div class="fretboard-mock">
+        <svg width="520" height="120" viewBox="0 0 520 120">
+          <!-- Fret lines -->
+          <line x1="40" y1="10" x2="40" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="100" y1="10" x2="100" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="160" y1="10" x2="160" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="220" y1="10" x2="220" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="280" y1="10" x2="280" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="340" y1="10" x2="340" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="400" y1="10" x2="400" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <line x1="460" y1="10" x2="460" y2="110" stroke="#4b5563" stroke-width="1"/>
+          <!-- String lines -->
+          <line x1="10" y1="20" x2="510" y2="20" stroke="#6b7280" stroke-width="1"/>
+          <line x1="10" y1="38" x2="510" y2="38" stroke="#6b7280" stroke-width="1"/>
+          <line x1="10" y1="56" x2="510" y2="56" stroke="#6b7280" stroke-width="1.2"/>
+          <line x1="10" y1="74" x2="510" y2="74" stroke="#6b7280" stroke-width="1.4"/>
+          <line x1="10" y1="92" x2="510" y2="92" stroke="#6b7280" stroke-width="1.6"/>
+
+          <!-- C6 chord: C=root(cyan), E/G/A=core(periwinkle), D=ext(orange) -->
+          <!-- Non-chord: gray -->
+          <circle cx="40" cy="20" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="40" y="20" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">F#</text>
+
+          <circle cx="40" cy="92" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="40" y="92" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">B</text>
+
+          <!-- Root: cyan (stands out) -->
+          <circle cx="100" cy="20" r="11" fill="#00E5D0" stroke="#00E5D0" stroke-width="2"/>
+          <text x="100" y="20" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">C</text>
+
+          <circle cx="160" cy="92" r="11" fill="#00E5D0" stroke="#00E5D0" stroke-width="2"/>
+          <text x="160" y="92" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">C</text>
+
+          <!-- Core (3rd, 5th, 6th): periwinkle -->
+          <circle cx="100" cy="38" r="11" fill="#7B8CDE" stroke="#7B8CDE" stroke-width="2"/>
+          <text x="100" y="38" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">E</text>
+
+          <circle cx="160" cy="56" r="11" fill="#7B8CDE" stroke="#7B8CDE" stroke-width="2"/>
+          <text x="160" y="56" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">G</text>
+
+          <circle cx="220" cy="74" r="11" fill="#7B8CDE" stroke="#7B8CDE" stroke-width="2"/>
+          <text x="220" y="74" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">A</text>
+
+          <circle cx="100" cy="92" r="11" fill="#7B8CDE" stroke="#7B8CDE" stroke-width="2"/>
+          <text x="100" y="92" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">A</text>
+
+          <!-- Extension (9th): orange -->
+          <circle cx="280" cy="38" r="11" fill="#F4A261" stroke="#F4A261" stroke-width="2"/>
+          <text x="280" y="38" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">D</text>
+
+          <!-- Non-chord -->
+          <circle cx="220" cy="20" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="220" y="20" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">D</text>
+
+          <circle cx="160" cy="38" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="160" y="38" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">F</text>
+
+          <circle cx="100" cy="56" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="100" y="56" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">F</text>
+
+          <circle cx="100" cy="74" r="11" fill="#1f2937" stroke="#4b5563" stroke-width="1"/>
+          <text x="100" y="74" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="9" font-family="monospace">F#</text>
+        </svg>
+      </div>
+      <div class="palette-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#00E5D0"></div>Root</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#7B8CDE"></div>Core (3, 5, 6, 7)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#F4A261"></div>Extensions (9, 11, 13)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#1f2937; border: 1px solid #4b5563"></div>Non-chord</div>
+      </div>
+      <div class="trade-note">
+        <strong>Pro:</strong> Root always jumps out (most important for steel players). Core vs extension still obvious. Only 3 colors to learn. No conflict with red pedal highlights.<br/>
+        <strong>Con:</strong> Can't distinguish 3rd from 5th visually — but the note name label is right there.
+      </div>
+    </div>
+  </div>
+</div>

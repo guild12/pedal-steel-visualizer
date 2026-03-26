@@ -1,0 +1,268 @@
+<h2>Chord Transitions — Finding the Easiest Path Between Two Chords</h2>
+<p class="subtitle">Select two chords, see the most efficient voicing pairs ranked by effort</p>
+
+<div class="section">
+  <h3>Transition Picker</h3>
+  <p>Extends the chord picker with a "from → to" layout. Pick chord A, pick chord B, see results.</p>
+  <div class="mockup">
+    <div class="mockup-header">Transition Picker UI</div>
+    <div class="mockup-body" style="background:#1a1a2e;padding:24px;overflow-x:auto;">
+      <div style="display:inline-flex;align-items:center;gap:16px;background:#12122a;border:1px solid #333;border-radius:10px;padding:14px 20px;">
+        <!-- Chord A -->
+        <div style="text-align:center;">
+          <div style="color:#00E5D0;font-size:9px;text-transform:uppercase;margin-bottom:6px;letter-spacing:1px;">From</div>
+          <div style="background:#1a1a2e;border:2px solid #00E5D0;border-radius:8px;padding:10px 18px;min-width:80px;">
+            <div style="color:#00E5D0;font-size:20px;font-weight:bold;">E</div>
+            <div style="color:#00E5D0;font-size:13px;">maj</div>
+          </div>
+          <div style="color:#555;font-size:9px;margin-top:4px;">click to change</div>
+        </div>
+
+        <!-- Arrow -->
+        <div style="color:#555;font-size:28px;margin-top:10px;">→</div>
+
+        <!-- Chord B -->
+        <div style="text-align:center;">
+          <div style="color:#e63946;font-size:9px;text-transform:uppercase;margin-bottom:6px;letter-spacing:1px;">To</div>
+          <div style="background:#1a1a2e;border:2px solid #e63946;border-radius:8px;padding:10px 18px;min-width:80px;">
+            <div style="color:#e63946;font-size:20px;font-weight:bold;">A</div>
+            <div style="color:#e63946;font-size:13px;">maj</div>
+          </div>
+          <div style="color:#555;font-size:9px;margin-top:4px;">click to change</div>
+        </div>
+
+        <!-- Divider -->
+        <div style="width:1px;height:70px;background:#333;margin:0 4px;"></div>
+
+        <!-- Results summary -->
+        <div style="text-align:left;">
+          <div style="color:#666;font-size:9px;text-transform:uppercase;margin-bottom:6px;">Best transitions</div>
+          <div style="color:#fff;font-size:13px;font-weight:bold;">3 voicing pairs found</div>
+          <div style="color:#888;font-size:11px;margin-top:2px;">Ranked by ease of movement</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Transition Results — Ranked Voicing Pairs</h3>
+  <p>Each result shows chord A and chord B side-by-side at their fret positions, with a movement summary between them.</p>
+  <div class="mockup">
+    <div class="mockup-header">E maj → A maj — Option 1 (Best: minimal movement)</div>
+    <div class="mockup-body" style="background:#1a1a2e;padding:20px;overflow-x:auto;">
+      <div style="display:flex;align-items:stretch;gap:0;flex-wrap:nowrap;">
+
+        <!-- Chord A voicing -->
+        <div style="flex:1;min-width:200px;">
+          <div style="color:#00E5D0;font-size:10px;text-transform:uppercase;margin-bottom:8px;letter-spacing:1px;">E maj at open</div>
+          <svg width="180" height="180" viewBox="0 0 180 180">
+            <text x="12" y="30" fill="#666" font-size="8">1</text>
+            <text x="12" y="56" fill="#666" font-size="8">2</text>
+            <text x="12" y="82" fill="#666" font-size="8">3</text>
+            <text x="12" y="108" fill="#666" font-size="8">4</text>
+            <text x="12" y="134" fill="#666" font-size="8">5</text>
+            <text x="12" y="160" fill="#666" font-size="8">6</text>
+            <line x1="25" y1="26" x2="170" y2="26" stroke="#444" stroke-width="1"/>
+            <line x1="25" y1="52" x2="170" y2="52" stroke="#444" stroke-width="1.1"/>
+            <line x1="25" y1="78" x2="170" y2="78" stroke="#444" stroke-width="1.3"/>
+            <line x1="25" y1="104" x2="170" y2="104" stroke="#444" stroke-width="1.5"/>
+            <line x1="25" y1="130" x2="170" y2="130" stroke="#444" stroke-width="1.8"/>
+            <line x1="25" y1="156" x2="170" y2="156" stroke="#444" stroke-width="2"/>
+            <!-- Nut -->
+            <line x1="40" y1="18" x2="40" y2="164" stroke="#888" stroke-width="3"/>
+
+            <!-- Notes at open (fret 0) -->
+            <circle cx="33" cy="26" r="10" fill="#00E5D0" fill-opacity="0.2" stroke="#00E5D0" stroke-width="1.5"/>
+            <text x="33" y="29" text-anchor="middle" fill="#00E5D0" font-size="8" font-weight="bold">E</text>
+            <circle cx="33" cy="52" r="10" fill="#7B8CDE" fill-opacity="0.2" stroke="#7B8CDE" stroke-width="1.5"/>
+            <text x="33" y="55" text-anchor="middle" fill="#7B8CDE" font-size="8" font-weight="bold">B</text>
+            <circle cx="33" cy="78" r="10" fill="#00E5D0" fill-opacity="0.2" stroke="#00E5D0" stroke-width="1"/>
+            <text x="33" y="81" text-anchor="middle" fill="#00E5D0" font-size="8">G#</text>
+            <circle cx="33" cy="104" r="10" fill="#00E5D0" fill-opacity="0.2" stroke="#00E5D0" stroke-width="1.5"/>
+            <text x="33" y="107" text-anchor="middle" fill="#00E5D0" font-size="8" font-weight="bold">E</text>
+            <circle cx="33" cy="130" r="10" fill="#7B8CDE" fill-opacity="0.2" stroke="#7B8CDE" stroke-width="1.5"/>
+            <text x="33" y="133" text-anchor="middle" fill="#7B8CDE" font-size="8" font-weight="bold">B</text>
+            <circle cx="33" cy="156" r="10" fill="#00E5D0" fill-opacity="0.15" stroke="#00E5D0" stroke-width="1"/>
+            <text x="33" y="159" text-anchor="middle" fill="#00E5D0" font-size="8">E</text>
+
+            <!-- Pedals label -->
+            <text x="90" y="178" fill="#666" font-size="9" text-anchor="middle">No pedals</text>
+          </svg>
+        </div>
+
+        <!-- Movement summary (the magic) -->
+        <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 12px;min-width:160px;">
+          <div style="background:#12122a;border:1px solid #333;border-radius:8px;padding:12px 16px;text-align:center;">
+            <div style="color:#F4A261;font-size:22px;font-weight:bold;margin-bottom:4px;">★</div>
+            <div style="color:#fff;font-size:12px;font-weight:bold;margin-bottom:8px;">Easiest transition</div>
+            <div style="display:flex;flex-direction:column;gap:6px;text-align:left;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="color:#00E5D0;font-size:18px;">⬤</div>
+                <div>
+                  <div style="color:#aaa;font-size:10px;">Bar movement</div>
+                  <div style="color:#fff;font-size:12px;font-weight:bold;">None (stay at open)</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="color:#e63946;font-size:14px;padding:0 4px;">⬤</div>
+                <div>
+                  <div style="color:#aaa;font-size:10px;">Pedal changes</div>
+                  <div style="color:#fff;font-size:12px;font-weight:bold;">Press A + B</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="color:#7B8CDE;font-size:14px;padding:0 4px;">⬤</div>
+                <div>
+                  <div style="color:#aaa;font-size:10px;">Common tones</div>
+                  <div style="color:#fff;font-size:12px;font-weight:bold;">3 of 6 strings</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Arrow -->
+          <div style="margin:8px 0;">
+            <svg width="80" height="20" viewBox="0 0 80 20">
+              <line x1="0" y1="10" x2="70" y2="10" stroke="#00E5D0" stroke-width="2"/>
+              <polygon points="70,4 80,10 70,16" fill="#00E5D0"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Chord B voicing -->
+        <div style="flex:1;min-width:200px;">
+          <div style="color:#e63946;font-size:10px;text-transform:uppercase;margin-bottom:8px;letter-spacing:1px;">A maj at open (pedals A+B)</div>
+          <svg width="180" height="180" viewBox="0 0 180 180">
+            <text x="12" y="30" fill="#666" font-size="8">1</text>
+            <text x="12" y="56" fill="#666" font-size="8">2</text>
+            <text x="12" y="82" fill="#666" font-size="8">3</text>
+            <text x="12" y="108" fill="#666" font-size="8">4</text>
+            <text x="12" y="134" fill="#666" font-size="8">5</text>
+            <text x="12" y="160" fill="#666" font-size="8">6</text>
+            <line x1="25" y1="26" x2="170" y2="26" stroke="#444" stroke-width="1"/>
+            <line x1="25" y1="52" x2="170" y2="52" stroke="#444" stroke-width="1.1"/>
+            <line x1="25" y1="78" x2="170" y2="78" stroke="#444" stroke-width="1.3"/>
+            <line x1="25" y1="104" x2="170" y2="104" stroke="#444" stroke-width="1.5"/>
+            <line x1="25" y1="130" x2="170" y2="130" stroke="#444" stroke-width="1.8"/>
+            <line x1="25" y1="156" x2="170" y2="156" stroke="#444" stroke-width="2"/>
+            <line x1="40" y1="18" x2="40" y2="164" stroke="#888" stroke-width="3"/>
+
+            <!-- Notes with pedals A+B engaged -->
+            <circle cx="33" cy="26" r="10" fill="#00E5D0" fill-opacity="0.2" stroke="#00E5D0" stroke-width="1.5"/>
+            <text x="33" y="29" text-anchor="middle" fill="#00E5D0" font-size="8" font-weight="bold">E</text>
+            <circle cx="33" cy="52" r="10" fill="#e63946" fill-opacity="0.2" stroke="#e63946" stroke-width="1.5"/>
+            <text x="33" y="55" text-anchor="middle" fill="#e63946" font-size="8" font-weight="bold">C#</text>
+            <circle cx="33" cy="78" r="10" fill="#00E5D0" fill-opacity="0.2" stroke="#00E5D0" stroke-width="1"/>
+            <text x="33" y="81" text-anchor="middle" fill="#00E5D0" font-size="8">A</text>
+            <circle cx="33" cy="104" r="10" fill="#7B8CDE" fill-opacity="0.2" stroke="#7B8CDE" stroke-width="1.5"/>
+            <text x="33" y="107" text-anchor="middle" fill="#7B8CDE" font-size="8" font-weight="bold">E</text>
+            <circle cx="33" cy="130" r="10" fill="#e63946" fill-opacity="0.2" stroke="#e63946" stroke-width="1.5"/>
+            <text x="33" y="133" text-anchor="middle" fill="#e63946" font-size="8" font-weight="bold">C#</text>
+            <circle cx="33" cy="156" r="10" fill="#00E5D0" fill-opacity="0.15" stroke="#00E5D0" stroke-width="1"/>
+            <text x="33" y="159" text-anchor="middle" fill="#00E5D0" font-size="8">A</text>
+
+            <text x="90" y="178" fill="#e63946" font-size="9" text-anchor="middle">Pedals A + B</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="mockup">
+    <div class="mockup-header">E maj → A maj — Option 2 (Move to fret 5)</div>
+    <div class="mockup-body" style="background:#1a1a2e;padding:16px 20px;">
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <div style="text-align:center;">
+          <div style="color:#00E5D0;font-size:10px;margin-bottom:4px;">E maj @ open</div>
+          <div style="background:#12122a;border:1px solid #00E5D0;border-radius:6px;padding:8px 14px;">
+            <div style="color:#00E5D0;font-size:14px;font-weight:bold;">Fret 0</div>
+            <div style="color:#666;font-size:10px;">No pedals</div>
+          </div>
+        </div>
+        <div style="color:#555;font-size:20px;">→</div>
+        <div style="text-align:center;">
+          <div style="color:#e63946;font-size:10px;margin-bottom:4px;">A maj @ fret 5</div>
+          <div style="background:#12122a;border:1px solid #e63946;border-radius:6px;padding:8px 14px;">
+            <div style="color:#e63946;font-size:14px;font-weight:bold;">Fret 5</div>
+            <div style="color:#666;font-size:10px;">No pedals</div>
+          </div>
+        </div>
+        <div style="width:1px;height:40px;background:#333;"></div>
+        <div>
+          <div style="color:#aaa;font-size:11px;">Bar: <span style="color:#F4A261;">move 5 frets</span></div>
+          <div style="color:#aaa;font-size:11px;">Pedals: <span style="color:#00E5D0;">none</span></div>
+          <div style="color:#aaa;font-size:11px;">Common tones: <span style="color:#7B8CDE;">4 of 6</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="mockup">
+    <div class="mockup-header">E maj → A maj — Option 3 (Fret 3 with pedals)</div>
+    <div class="mockup-body" style="background:#1a1a2e;padding:16px 20px;">
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <div style="text-align:center;">
+          <div style="color:#00E5D0;font-size:10px;margin-bottom:4px;">E maj @ open</div>
+          <div style="background:#12122a;border:1px solid #00E5D0;border-radius:6px;padding:8px 14px;">
+            <div style="color:#00E5D0;font-size:14px;font-weight:bold;">Fret 0</div>
+            <div style="color:#666;font-size:10px;">No pedals</div>
+          </div>
+        </div>
+        <div style="color:#555;font-size:20px;">→</div>
+        <div style="text-align:center;">
+          <div style="color:#e63946;font-size:10px;margin-bottom:4px;">A maj @ fret 3</div>
+          <div style="background:#12122a;border:1px solid #e63946;border-radius:6px;padding:8px 14px;">
+            <div style="color:#e63946;font-size:14px;font-weight:bold;">Fret 3</div>
+            <div style="color:#666;font-size:10px;">Pedals A + B + C</div>
+          </div>
+        </div>
+        <div style="width:1px;height:40px;background:#333;"></div>
+        <div>
+          <div style="color:#aaa;font-size:11px;">Bar: <span style="color:#F4A261;">move 3 frets</span></div>
+          <div style="color:#aaa;font-size:11px;">Pedals: <span style="color:#e63946;">+3 changes</span></div>
+          <div style="color:#aaa;font-size:11px;">Common tones: <span style="color:#7B8CDE;">2 of 6</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Key Concepts</h3>
+  <div style="display:grid;gap:8px;margin-top:8px;">
+    <div style="background:#12122a;border:1px solid #333;border-radius:6px;padding:10px 14px;">
+      <span style="color:#00E5D0;font-weight:bold;">Results ranked by total effort.</span>
+      <span style="color:#aaa;"> Combines fret distance + number of pedal/lever changes + common tones retained. Least effort first.</span>
+    </div>
+    <div style="background:#12122a;border:1px solid #333;border-radius:6px;padding:10px 14px;">
+      <span style="color:#00E5D0;font-weight:bold;">Clicking a result highlights both voicings on the fretboard.</span>
+      <span style="color:#aaa;"> Chord A in cyan, chord B in red — so you can see the physical relationship on the neck.</span>
+    </div>
+    <div style="background:#12122a;border:1px solid #333;border-radius:6px;padding:10px 14px;">
+      <span style="color:#00E5D0;font-weight:bold;">Future: chain multiple transitions for song charts.</span>
+      <span style="color:#aaa;"> Same engine, extended to A → B → C → D with cumulative path optimization.</span>
+    </div>
+  </div>
+</div>
+
+<h3 style="margin-top:20px;">How does the transition feature feel?</h3>
+<div class="options">
+  <div class="option" data-choice="good" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Love it</h3>
+      <p>The from→to picker and ranked results work. Let's keep going.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="tweak" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Needs adjustments</h3>
+      <p>I'll tell you what to change.</p>
+    </div>
+  </div>
+</div>
