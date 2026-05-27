@@ -5,6 +5,9 @@
 // per-control colors from controlColors.ts.
 export type EaseBucket = 'easy' | 'medium' | 'hard';
 
+// Thresholds are tuned to scoreMove's weighting in transitionScoring.ts
+// (fretDistance*10 + controlChanges*5 - commonTones*2): "easy" ≈ a pedal
+// change or two with no bar move; "hard" ≈ a multi-fret slide.
 export function bucketEase(totalScore: number): EaseBucket {
   if (totalScore <= 5) return 'easy';
   if (totalScore <= 20) return 'medium';

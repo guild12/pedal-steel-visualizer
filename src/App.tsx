@@ -7,8 +7,7 @@ import { useCopedentState } from './hooks/useCopedentState'
 import { useChordState } from './hooks/useChordState'
 import { detectChord, getChordTones, getExtensions, noteNameToSemitone, parseExtension } from './utils/chordDetection'
 import { findVoicings } from './utils/voicingSearch'
-import { findTransitions } from './utils/transitionScoring'
-import { scoreMove } from './utils/transitionScoring'
+import { findTransitions, scoreMove } from './utils/transitionScoring'
 import { calculateFretNote, NOTE_NAMES } from './utils/noteUtils'
 import { INTERVAL_TO_FUNCTION } from './utils/chordDictionary'
 import { ChordAnalyzerBadge } from './components/ChordVisualization/ChordAnalyzerBadge'
@@ -113,10 +112,18 @@ function App() {
         pitchClass: calculateFretNote(s.openNote, fret, s.changes, state.engagedControls),
       })),
     };
+    // One move per fret (the easiest), so the panel rows and the per-fret
+    // ghost bars in the overlay stay 1:1 and never disagree.
     const targets = findVoicings(root, quality, state.activeCopedent);
-    return targets
-      .map<ScoredMove>(target => ({ target, effort: scoreMove(source, target) }))
-      .sort((a, b) => a.effort.totalScore - b.effort.totalScore);
+    const bestByFret = new Map<number, ScoredMove>();
+    for (const target of targets) {
+      const move: ScoredMove = { target, effort: scoreMove(source, target) };
+      const existing = bestByFret.get(target.fret);
+      if (!existing || move.effort.totalScore < existing.effort.totalScore) {
+        bestByFret.set(target.fret, move);
+      }
+    }
+    return [...bestByFret.values()].sort((a, b) => a.effort.totalScore - b.effort.totalScore);
   }, [
     chordState.moveTo?.targetChord,
     chordState.selectedFret,

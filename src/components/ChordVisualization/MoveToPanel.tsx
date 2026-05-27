@@ -25,7 +25,7 @@ export function MoveToPanel({ moves, inspectedIndex, onInspect, onCommit }: Move
 
         return (
           <div
-            key={i}
+            key={target.fret}
             onClick={() => onInspect(i)}
             className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer ${
               isInspected ? 'bg-gray-800 border' : 'bg-gray-900 border border-gray-700 hover:border-gray-600'
