@@ -11,6 +11,7 @@ interface StringLinesProps {
 }
 
 const DASH = 12
+const ENGAGED_BOOST = 1.5
 
 export function StringLines({ strings, engagedControls, fretboardHeight, totalWidth }: StringLinesProps) {
   const lines: JSX.Element[] = []
@@ -18,6 +19,8 @@ export function StringLines({ strings, engagedControls, fretboardHeight, totalWi
   strings.forEach((s, i) => {
     const y = getStringY(i, strings.length, fretboardHeight)
     const thickness = getStringThickness(i, strings.length)
+    // Engaged strings render a bit thicker so the change reads at a glance.
+    const engagedWidth = thickness + ENGAGED_BOOST
     // Dedupe in case a string lists the same control twice (user-created copedent).
     const affecting = [...new Set(
       s.changes
@@ -33,13 +36,13 @@ export function StringLines({ strings, engagedControls, fretboardHeight, totalWi
     } else if (affecting.length === 1) {
       lines.push(
         <line key={i} x1={0} y1={y} x2={totalWidth} y2={y}
-          stroke={getControlColor(affecting[0])} strokeWidth={thickness} />
+          stroke={getControlColor(affecting[0])} strokeWidth={engagedWidth} />
       )
     } else {
       affecting.forEach((control, ci) => {
         lines.push(
           <line key={`${i}-${control}`} x1={0} y1={y} x2={totalWidth} y2={y}
-            stroke={getControlColor(control)} strokeWidth={thickness}
+            stroke={getControlColor(control)} strokeWidth={engagedWidth}
             strokeDasharray={`${DASH},${DASH * (affecting.length - 1)}`}
             strokeDashoffset={ci * DASH} />
         )

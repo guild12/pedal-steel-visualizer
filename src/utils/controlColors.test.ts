@@ -4,7 +4,15 @@ import { getControlColor, readableTextColor } from './controlColors'
 describe('getControlColor', () => {
   it('returns the fixed color for known control names', () => {
     expect(getControlColor('A')).toBe('#E63946')
-    expect(getControlColor('LKL')).toBe('#8338EC')
+    expect(getControlColor('LKL')).toBe('#4361EE')
+  })
+
+  it('never gives a pedal the same color as a knee lever', () => {
+    const pedalColors = ['A', 'B', 'C', '4', '5', '6', '7', '8'].map(getControlColor)
+    const leverColors = ['LKL', 'LKR', 'LKV', 'VLOCK', 'RKL', 'RKR', 'RKR2'].map(getControlColor)
+    for (const pc of pedalColors) {
+      expect(leverColors).not.toContain(pc)
+    }
   })
 
   it('maps letter and number pedals that share a slot to the same color', () => {

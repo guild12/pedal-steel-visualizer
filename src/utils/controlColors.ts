@@ -1,20 +1,24 @@
-/** Fixed display color per control name. Pedals A/1, B/2, C/3 share a slot. */
+// Pedals use a WARM family and knee levers use a COOL family, so a pedal can
+// never share (or be confused with) a knee-lever color. Pedals A/1, B/2, C/3
+// share a slot (lettered vs numbered naming for the same pedal).
 export const CONTROL_COLORS: Record<string, string> = {
-  A: '#E63946', '1': '#E63946',
-  B: '#4895EF', '2': '#4895EF',
-  C: '#43AA8B', '3': '#43AA8B',
-  '4': '#F3722C',
-  '5': '#9D4EDD',
-  '6': '#FF6B9D',
-  '7': '#06D6A0',
-  '8': '#FFD166',
-  LKL: '#8338EC',
-  LKR: '#3A86FF',
-  LKV: '#FB5607',
-  VLOCK: '#FFBE0B',
-  RKL: '#FF006E',
-  RKR: '#00B4D8',
-  RKR2: '#80B918',
+  // Pedals — warm (reds / oranges / yellows / pinks)
+  A: '#E63946', '1': '#E63946', // red
+  B: '#FB8500', '2': '#FB8500', // orange
+  C: '#FFB703', '3': '#FFB703', // amber
+  '4': '#FFD60A',               // yellow
+  '5': '#FF5DA2',               // pink
+  '6': '#C81D6B',               // magenta
+  '7': '#F3722C',               // burnt orange
+  '8': '#D00000',               // deep red
+  // Knee levers — cool (blues / greens / purples)
+  LKL: '#4361EE',   // blue
+  LKR: '#4CC9F0',   // sky
+  LKV: '#06D6A0',   // mint
+  VLOCK: '#3A0CA3', // indigo
+  RKL: '#2A9D8F',   // teal
+  RKR: '#7B2CBF',   // purple
+  RKR2: '#80B918',  // lime
 }
 
 const FALLBACK_PALETTE = [
