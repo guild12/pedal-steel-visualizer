@@ -8,14 +8,16 @@ import { useChordState } from './hooks/useChordState'
 import { detectChord, getChordTones, getExtensions, noteNameToSemitone, parseExtension } from './utils/chordDetection'
 import { findVoicings } from './utils/voicingSearch'
 import { findTransitions } from './utils/transitionScoring'
+import { scoreMove } from './utils/transitionScoring'
 import { calculateFretNote, NOTE_NAMES } from './utils/noteUtils'
 import { INTERVAL_TO_FUNCTION } from './utils/chordDictionary'
 import { ChordAnalyzerBadge } from './components/ChordVisualization/ChordAnalyzerBadge'
 import { ChordPicker } from './components/ChordVisualization/ChordPicker'
 import { TransitionPicker } from './components/ChordVisualization/TransitionPicker'
 import { TransitionResults } from './components/ChordVisualization/TransitionResults'
+import { MoveToPanel } from './components/ChordVisualization/MoveToPanel'
 import type { Copedent } from './types'
-import type { ChordName } from './types/chordTypes'
+import type { ChordName, ScoredMove, VoicingResult } from './types/chordTypes'
 
 function App() {
   const state = useCopedentState()
@@ -98,6 +100,43 @@ function App() {
     const { chordA, chordB } = chordState.chordTransition;
     return findTransitions(chordA.root, chordA.quality, chordB.root, chordB.quality, state.activeCopedent);
   }, [chordState.chordTransition?.chordA, chordState.chordTransition?.chordB, state.activeCopedent]);
+
+  // Compute ranked moves from the live position to the target chord
+  const moveResults = useMemo<ScoredMove[]>(() => {
+    if (!chordState.moveTo?.targetChord) return [];
+    const { root, quality } = chordState.moveTo.targetChord;
+    const fret = chordState.selectedFret ?? 0;
+    const source = {
+      fret,
+      engagedControls: [...state.engagedControls],
+      notes: state.activeCopedent.strings.map(s => ({
+        pitchClass: calculateFretNote(s.openNote, fret, s.changes, state.engagedControls),
+      })),
+    };
+    const targets = findVoicings(root, quality, state.activeCopedent);
+    return targets
+      .map<ScoredMove>(target => ({ target, effort: scoreMove(source, target) }))
+      .sort((a, b) => a.effort.totalScore - b.effort.totalScore);
+  }, [
+    chordState.moveTo?.targetChord,
+    chordState.selectedFret,
+    state.engagedControls,
+    state.activeCopedent,
+  ]);
+
+  // Fret currently inspected in Move-To (for overlay highlight)
+  const moveInspectedFret =
+    chordState.moveTo?.inspectedIndex != null
+      ? moveResults[chordState.moveTo.inspectedIndex]?.target.fret ?? null
+      : null;
+
+  // Commit a move: drive bar + engaged controls to the chosen voicing
+  const handleMoveCommit = (target: VoicingResult) => {
+    state.setControls(target.engagedControls);
+    if (chordState.selectedFret !== target.fret) {
+      chordState.selectFret(target.fret);
+    }
+  };
 
   const handleCreateNew = () => {
     const newCopedent: Copedent = {
@@ -184,6 +223,16 @@ function App() {
           />
         )}
 
+        {/* Move-To Picker (above fretboard) */}
+        {chordState.moveTo?.active && (
+          <ChordPicker
+            onChordSelect={(root, quality) => chordState.activateMoveTo(root, quality)}
+            onClose={() => chordState.deactivateMoveTo()}
+            selectedRoot={chordState.moveTo.targetChord?.root}
+            selectedQuality={chordState.moveTo.targetChord?.quality}
+          />
+        )}
+
         {/* Fretboard */}
         <Fretboard
           copedent={state.activeCopedent}
@@ -195,6 +244,12 @@ function App() {
           chordNotes={chordNotesMap}
           finderResults={finderResults}
           finderTargetChord={chordState.chordFinder?.targetChord ?? null}
+          moveResults={chordState.moveTo?.active ? moveResults : null}
+          moveInspectedFret={moveInspectedFret}
+          onMoveInspectFret={(fret) => {
+            const idx = moveResults.findIndex(m => m.target.fret === fret);
+            if (idx >= 0) chordState.inspectMoveResult(idx);
+          }}
           colorTheme={state.colorTheme}
         />
 
@@ -214,6 +269,16 @@ function App() {
             results={transitionResults}
             selectedIndex={chordState.chordTransition.selectedResultIndex}
             onSelect={(idx) => chordState.selectTransitionResult(idx)}
+          />
+        )}
+
+        {/* Move-To panel (below fretboard) */}
+        {chordState.moveTo?.active && (
+          <MoveToPanel
+            moves={moveResults}
+            inspectedIndex={chordState.moveTo.inspectedIndex}
+            onInspect={(idx) => chordState.inspectMoveResult(idx)}
+            onCommit={handleMoveCommit}
           />
         )}
 
@@ -241,6 +306,14 @@ function App() {
               chordState.deactivateTransition();
             } else {
               chordState.activateTransition('E', 'maj', 'A', 'maj');
+            }
+          }}
+          moveToActive={chordState.moveTo?.active ?? false}
+          onMoveToToggle={() => {
+            if (chordState.moveTo?.active) {
+              chordState.deactivateMoveTo();
+            } else {
+              chordState.activateMoveTo('C', 'maj');
             }
           }}
           colorTheme={state.colorTheme}

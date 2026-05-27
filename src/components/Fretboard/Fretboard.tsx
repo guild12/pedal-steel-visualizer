@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react'
 import type { Copedent, NoteDisplayMode, ColorTheme } from '../../types'
-import type { VoicingResult } from '../../types/chordTypes'
+import type { VoicingResult, ScoredMove } from '../../types/chordTypes'
 import { TOTAL_FRETS } from '../../utils/fretUtils'
 import { getFretX } from '../../utils/fretUtils'
 import { FretLines } from './FretLines'
@@ -8,6 +8,7 @@ import { StringLines } from './StringLines'
 import { NoteIndicators } from './NoteIndicators'
 import { FretMarkers } from './FretMarkers'
 import { ChordFinderOverlay } from '../ChordVisualization/ChordFinderOverlay'
+import { MoveToOverlay } from '../ChordVisualization/MoveToOverlay'
 
 interface FretboardProps {
   copedent: Copedent;
@@ -20,6 +21,9 @@ interface FretboardProps {
   chordNotes?: Map<string, { fn: string; isExtension: boolean }> | null;
   finderResults?: VoicingResult[] | null;
   finderTargetChord?: { root: string; quality: string } | null;
+  moveResults?: ScoredMove[] | null;
+  moveInspectedFret?: number | null;
+  onMoveInspectFret?: (fret: number) => void;
   colorTheme?: ColorTheme;
 }
 
@@ -30,7 +34,7 @@ const STRING_LABEL_WIDTH = 30
 const FRETBOARD_HEIGHT = 300
 const MIN_FRET_WIDTH = 28
 
-export function Fretboard({ copedent, engagedControls, displayMode, selectedKey, selectedFret = null, onFretClick, chordNotes = null, finderResults = null, finderTargetChord = null, colorTheme = 'chordTones' }: FretboardProps) {
+export function Fretboard({ copedent, engagedControls, displayMode, selectedKey, selectedFret = null, onFretClick, chordNotes = null, finderResults = null, finderTargetChord = null, moveResults = null, moveInspectedFret = null, onMoveInspectFret, colorTheme = 'chordTones' }: FretboardProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState(1200)
 
@@ -185,6 +189,18 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
               fretboardHeight={FRETBOARD_HEIGHT}
               leftMargin={LEFT_MARGIN}
               targetChord={finderTargetChord}
+            />
+          )}
+
+          {/* Move-To overlay */}
+          {moveResults && moveResults.length > 0 && (
+            <MoveToOverlay
+              moves={moveResults}
+              inspectedFret={moveInspectedFret}
+              fretboardWidth={fretboardWidth}
+              fretboardHeight={FRETBOARD_HEIGHT}
+              leftMargin={LEFT_MARGIN}
+              onInspectFret={(fret) => onMoveInspectFret?.(fret)}
             />
           )}
         </g>

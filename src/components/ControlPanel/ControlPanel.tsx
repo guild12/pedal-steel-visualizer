@@ -19,6 +19,8 @@ interface ControlPanelProps {
   onTransitionToggle?: () => void;
   chordFinderActive?: boolean;
   transitionActive?: boolean;
+  onMoveToToggle?: () => void;
+  moveToActive?: boolean;
   colorTheme?: ColorTheme;
   onColorThemeChange?: (theme: ColorTheme) => void;
 }
@@ -28,6 +30,7 @@ export function ControlPanel({
   displayMode, selectedKey, onDisplayModeChange, onSelectedKeyChange,
   onChordFinderToggle, onTransitionToggle,
   chordFinderActive = false, transitionActive = false,
+  onMoveToToggle, moveToActive = false,
   colorTheme = 'chordTones', onColorThemeChange,
 }: ControlPanelProps) {
   return (
@@ -90,6 +93,14 @@ export function ControlPanel({
             }`}
           >
             Transitions
+          </button>
+          <button
+            onClick={onMoveToToggle}
+            className={`px-3 py-1 rounded text-sm ${
+              moveToActive ? 'bg-cyan-400 text-gray-950' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+            }`}
+          >
+            Move To
           </button>
         </div>
         <DisplayOptions
