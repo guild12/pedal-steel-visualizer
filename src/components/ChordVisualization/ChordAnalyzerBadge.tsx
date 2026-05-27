@@ -13,6 +13,9 @@ interface ChordAnalyzerBadgeProps {
   overrideChord?: ChordName | null;
   onChordOverride?: (chord: ChordName | null) => void;
   activeExtensions?: string[];
+  showExtensions?: boolean;
+  mutedExtensions?: Set<string>;
+  onToggleExtension?: (note: string) => void;
 }
 
 export function ChordAnalyzerBadge({
@@ -22,6 +25,9 @@ export function ChordAnalyzerBadge({
   overrideChord = null,
   onChordOverride,
   activeExtensions,
+  showExtensions = true,
+  mutedExtensions,
+  onToggleExtension,
 }: ChordAnalyzerBadgeProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -34,8 +40,10 @@ export function ChordAnalyzerBadge({
   const displayedChord = overrideChord ?? primary;
   const isOverridden = overrideChord !== null;
 
-  // Extensions: use activeExtensions from parent (handles both detected and override)
-  const extensions = activeExtensions ?? layers.extensions;
+  // Extensions: use activeExtensions from parent (handles both detected and override).
+  // Global toggle hides them entirely; per-extension muting greys individual ones.
+  const extensions = showExtensions ? (activeExtensions ?? layers.extensions) : [];
+  const muted = mutedExtensions ?? new Set<string>();
 
   // Chord tone degrees (e.g., "1 3 5 7") with function labels for coloring
   const chordDegrees = (() => {
@@ -99,11 +107,14 @@ export function ChordAnalyzerBadge({
             {extensions.map((e, i) => {
               const label = e.split(' ')[0];
               const note = e.match(/\(([^)]+)\)/)?.[1] ?? '';
+              const isMuted = muted.has(note);
               return (
                 <span
                   key={i}
-                  className="flex flex-col items-center leading-tight"
-                  style={{ color: resolveChordColor(label, colorTheme, true) ?? '#F4A261' }}
+                  onClick={onToggleExtension ? (ev) => { ev.stopPropagation(); onToggleExtension(note); } : undefined}
+                  title={onToggleExtension ? (isMuted ? 'Click to show this extension' : 'Click to mute this extension') : undefined}
+                  className={`flex flex-col items-center leading-tight ${onToggleExtension ? 'cursor-pointer' : ''}`}
+                  style={{ color: isMuted ? '#6b7280' : (resolveChordColor(label, colorTheme, true) ?? '#F4A261') }}
                 >
                   <span>{label}</span>
                   {note && <span className="text-[10px] font-mono opacity-90">{note}</span>}
@@ -161,12 +172,16 @@ export function ChordAnalyzerBadge({
         <div className="mt-2 pt-2 border-t border-gray-800">
           <div className="text-xs mb-1">
             <span className="text-gray-500">Extensions: </span>
-            {extensions.map((ext, i) => (
-              <span key={i}>
-                {i > 0 && <span className="text-gray-600">, </span>}
-                <span style={{ color: resolveChordColor(ext.split(' ')[0], colorTheme, true) ?? '#F4A261' }}>{ext}</span>
-              </span>
-            ))}
+            {extensions.map((ext, i) => {
+              const note = ext.match(/\(([^)]+)\)/)?.[1] ?? '';
+              const isMuted = muted.has(note);
+              return (
+                <span key={i}>
+                  {i > 0 && <span className="text-gray-600">, </span>}
+                  <span style={{ color: isMuted ? '#6b7280' : (resolveChordColor(ext.split(' ')[0], colorTheme, true) ?? '#F4A261') }}>{ext}</span>
+                </span>
+              );
+            })}
           </div>
         </div>
       )}

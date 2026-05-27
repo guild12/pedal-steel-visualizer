@@ -6,10 +6,13 @@ interface DisplayOptionsProps {
   selectedKey: string;
   onDisplayModeChange: (mode: NoteDisplayMode) => void;
   onSelectedKeyChange: (key: string) => void;
+  showExtensions: boolean;
+  onToggleShowExtensions: () => void;
 }
 
 export function DisplayOptions({
   displayMode, selectedKey, onDisplayModeChange, onSelectedKeyChange,
+  showExtensions, onToggleShowExtensions,
 }: DisplayOptionsProps) {
   return (
     <div className="flex items-center gap-4">
@@ -36,6 +39,18 @@ export function DisplayOptions({
           Scale Degrees
         </button>
       </div>
+
+      <button
+        onClick={onToggleShowExtensions}
+        title="Show or hide extension tones on the fretboard and badge"
+        className={`px-3 py-1 text-sm rounded ${
+          showExtensions
+            ? 'bg-gray-600 text-white'
+            : 'bg-gray-800 text-gray-400 hover:text-gray-200'
+        }`}
+      >
+        Extensions
+      </button>
 
       {displayMode === 'scaleDegrees' && (
         <div className="flex items-center gap-2">

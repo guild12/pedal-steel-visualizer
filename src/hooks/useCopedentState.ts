@@ -14,6 +14,9 @@ export function useCopedentState() {
       ? saved
       : 'chordTones'
   })
+  const [showExtensions, setShowExtensions] = useState<boolean>(() => {
+    return localStorage.getItem('psv-showExtensions') !== 'false'
+  })
 
   // Persist on change
   useEffect(() => {
@@ -23,6 +26,10 @@ export function useCopedentState() {
   useEffect(() => {
     localStorage.setItem('psv-colorTheme', colorTheme)
   }, [colorTheme])
+
+  useEffect(() => {
+    localStorage.setItem('psv-showExtensions', String(showExtensions))
+  }, [showExtensions])
 
   const activeCopedent = copedents.find(c => c.id === activeCopedentId) ?? copedents[0]
 
@@ -46,6 +53,10 @@ export function useCopedentState() {
 
   const setControls = useCallback((controls: string[]) => {
     setEngagedControls(new Set(controls))
+  }, [])
+
+  const toggleShowExtensions = useCallback(() => {
+    setShowExtensions(v => !v)
   }, [])
 
   const updateCopedent = useCallback((id: string, updates: Partial<Copedent>) => {
@@ -91,10 +102,12 @@ export function useCopedentState() {
     displayMode,
     selectedKey,
     colorTheme,
+    showExtensions,
     setActiveCopedentId: switchCopedent,
     toggleControl,
     clearAllControls,
     setControls,
+    toggleShowExtensions,
     setDisplayMode,
     setSelectedKey,
     setColorTheme,

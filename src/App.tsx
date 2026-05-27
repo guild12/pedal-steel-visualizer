@@ -27,6 +27,19 @@ function App() {
   // Override chord selection — when user clicks an alternative in the badge
   const [overrideChord, setOverrideChord] = useState<ChordName | null>(null);
 
+  // Extensions the user has muted on the current chord (keyed by note name).
+  // Ephemeral: reset whenever the detected chord changes.
+  const [mutedExtensions, setMutedExtensions] = useState<Set<string>>(new Set());
+
+  const toggleMutedExtension = (note: string) => {
+    setMutedExtensions(prev => {
+      const next = new Set(prev);
+      if (next.has(note)) next.delete(note);
+      else next.add(note);
+      return next;
+    });
+  };
+
   // Compute chord detection for current fret + controls
   const currentDetection = useMemo(() => {
     const fret = chordState.selectedFret ?? 0;
@@ -36,9 +49,10 @@ function App() {
     return detectChord(notes);
   }, [chordState.selectedFret, state.engagedControls, state.activeCopedent]);
 
-  // Auto-reset override when detection changes (fret change, pedal toggle, etc.)
+  // Auto-reset override + muted extensions when detection changes (fret change, pedal toggle, etc.)
   useEffect(() => {
     setOverrideChord(null);
+    setMutedExtensions(new Set());
   }, [currentDetection]);
 
   // Active chord: override wins over auto-detected
@@ -75,16 +89,19 @@ function App() {
       }
     }
 
-    // Extension tones — always marked as extensions
-    for (const ext of activeExtensions) {
-      const parsed = parseExtension(ext);
-      if (parsed) {
-        map.set(parsed.note, { fn: parsed.label, isExtension: true });
+    // Extension tones — marked as extensions, unless extensions are globally
+    // disabled or this specific one has been muted on the badge.
+    if (state.showExtensions) {
+      for (const ext of activeExtensions) {
+        const parsed = parseExtension(ext);
+        if (parsed && !mutedExtensions.has(parsed.note)) {
+          map.set(parsed.note, { fn: parsed.label, isExtension: true });
+        }
       }
     }
 
     return map;
-  }, [activeChord, activeExtensions, chordState.selectedFret]);
+  }, [activeChord, activeExtensions, chordState.selectedFret, state.showExtensions, mutedExtensions]);
 
   // Compute voicing search results for chord finder
   const finderResults = useMemo(() => {
@@ -269,6 +286,9 @@ function App() {
           overrideChord={overrideChord}
           onChordOverride={setOverrideChord}
           activeExtensions={activeExtensions}
+          showExtensions={state.showExtensions}
+          mutedExtensions={mutedExtensions}
+          onToggleExtension={toggleMutedExtension}
         />
 
         {/* Transition Results (below fretboard) */}
@@ -296,6 +316,8 @@ function App() {
           engagedControls={state.engagedControls}
           onToggleControl={state.toggleControl}
           onClearAll={state.clearAllControls}
+          showExtensions={state.showExtensions}
+          onToggleShowExtensions={state.toggleShowExtensions}
           displayMode={state.displayMode}
           selectedKey={state.selectedKey}
           onDisplayModeChange={state.setDisplayMode}

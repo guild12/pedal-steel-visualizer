@@ -88,6 +88,20 @@ describe('useCopedentState', () => {
     expect(result.current.engagedControls).toEqual(new Set())
   })
 
+  it('defaults showExtensions to true, toggles it, and persists', () => {
+    const { result } = renderHook(() => useCopedentState())
+    expect(result.current.showExtensions).toBe(true)
+    act(() => result.current.toggleShowExtensions())
+    expect(result.current.showExtensions).toBe(false)
+    expect(localStorage.getItem('psv-showExtensions')).toBe('false')
+  })
+
+  it('restores showExtensions=false from localStorage', () => {
+    localStorage.setItem('psv-showExtensions', 'false')
+    const { result } = renderHook(() => useCopedentState())
+    expect(result.current.showExtensions).toBe(false)
+  })
+
   it('creates a new copedent and switches to it', () => {
     const { result } = renderHook(() => useCopedentState())
     const newCop = {

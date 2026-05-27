@@ -13,6 +13,8 @@ const defaultProps = {
   selectedKey: 'C',
   onDisplayModeChange: vi.fn(),
   onSelectedKeyChange: vi.fn(),
+  showExtensions: true,
+  onToggleShowExtensions: vi.fn(),
 }
 
 describe('ControlPanel', () => {

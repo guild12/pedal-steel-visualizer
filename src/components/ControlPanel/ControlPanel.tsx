@@ -14,6 +14,8 @@ interface ControlPanelProps {
   selectedKey: string;
   onDisplayModeChange: (mode: NoteDisplayMode) => void;
   onSelectedKeyChange: (key: string) => void;
+  showExtensions: boolean;
+  onToggleShowExtensions: () => void;
   // New chord props
   onChordFinderToggle?: () => void;
   onTransitionToggle?: () => void;
@@ -28,6 +30,7 @@ interface ControlPanelProps {
 export function ControlPanel({
   pedals, kneeLevers, engagedControls, onToggleControl, onClearAll,
   displayMode, selectedKey, onDisplayModeChange, onSelectedKeyChange,
+  showExtensions, onToggleShowExtensions,
   onChordFinderToggle, onTransitionToggle,
   chordFinderActive = false, transitionActive = false,
   onMoveToToggle, moveToActive = false,
@@ -108,6 +111,8 @@ export function ControlPanel({
           selectedKey={selectedKey}
           onDisplayModeChange={onDisplayModeChange}
           onSelectedKeyChange={onSelectedKeyChange}
+          showExtensions={showExtensions}
+          onToggleShowExtensions={onToggleShowExtensions}
         />
         {onColorThemeChange && (
           <ColorThemeSelector

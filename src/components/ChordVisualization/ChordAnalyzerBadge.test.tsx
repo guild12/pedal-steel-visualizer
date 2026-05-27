@@ -32,6 +32,30 @@ describe('ChordAnalyzerBadge', () => {
     expect(getByText(/OPEN STRINGS/)).toBeTruthy();
   });
 
+  it('clicking an extension calls onToggleExtension with its note', () => {
+    const onToggleExtension = vi.fn();
+    const { getByText } = render(
+      <ChordAnalyzerBadge detection={mockDetection} fret={0} onToggleExtension={onToggleExtension} />
+    );
+    fireEvent.click(getByText('9'));
+    expect(onToggleExtension).toHaveBeenCalledWith('F#');
+  });
+
+  it('greys a muted extension instead of coloring it', () => {
+    const { getByText } = render(
+      <ChordAnalyzerBadge detection={mockDetection} fret={0} mutedExtensions={new Set(['F#'])} />
+    );
+    const labelSpan = getByText('9').closest('span[style]') as HTMLElement;
+    expect(labelSpan.getAttribute('style')).toContain('rgb(107, 114, 128)'); // #6b7280
+  });
+
+  it('hides extensions entirely when showExtensions is false', () => {
+    const { queryByText } = render(
+      <ChordAnalyzerBadge detection={mockDetection} fret={0} showExtensions={false} />
+    );
+    expect(queryByText('9')).toBeNull();
+  });
+
   it('renders chord name in root color (cyan) with default theme', () => {
     const { container } = render(
       <ChordAnalyzerBadge detection={mockDetection} fret={0} />
