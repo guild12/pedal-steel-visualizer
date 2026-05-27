@@ -1,5 +1,10 @@
 import type { Copedent } from '../types';
-import type { TransitionResult, TransitionEffort, ControlChange, VoicingResult } from '../types/chordTypes';
+import type {
+  TransitionResult,
+  TransitionEffort,
+  ControlChange,
+  EffortPosition,
+} from '../types/chordTypes';
 import { findVoicings } from './voicingSearch';
 
 export function findTransitions(
@@ -17,7 +22,7 @@ export function findTransitions(
 
   for (const from of voicingsA) {
     for (const to of voicingsB) {
-      const effort = calculateEffort(from, to);
+      const effort = scoreMove(from, to);
       results.push({ from, to, effort });
     }
   }
@@ -26,7 +31,8 @@ export function findTransitions(
   return results.slice(0, maxResults);
 }
 
-function calculateEffort(from: VoicingResult, to: VoicingResult): TransitionEffort {
+/** Effort to move from one position/voicing to another. Lower totalScore = easier. */
+export function scoreMove(from: EffortPosition, to: EffortPosition): TransitionEffort {
   const fretDistance = Math.abs(from.fret - to.fret);
 
   const fromControls = new Set(from.engagedControls);

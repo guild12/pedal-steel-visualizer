@@ -66,6 +66,19 @@ export interface TransitionResult {
   effort: TransitionEffort;
 }
 
+/** Minimal shape needed to score a move: a fret, engaged controls, and per-string pitch classes. */
+export interface EffortPosition {
+  fret: number;
+  engagedControls: string[];
+  notes: { pitchClass: string }[];
+}
+
+/** A candidate target voicing paired with the effort to reach it from the current position. */
+export interface ScoredMove {
+  target: VoicingResult;
+  effort: TransitionEffort;
+}
+
 export interface ChordFinderState {
   active: boolean;
   targetChord: { root: string; quality: string } | null;
