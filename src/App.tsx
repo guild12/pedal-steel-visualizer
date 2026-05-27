@@ -291,6 +291,7 @@ function App() {
           showExtensions={state.showExtensions}
           mutedNotes={mutedNotes}
           onToggleNote={toggleMutedNote}
+          pinnedChord={chordState.moveTo?.active ? chordState.moveTo.targetChord : null}
         />
 
         {/* Transition Results (below fretboard) */}

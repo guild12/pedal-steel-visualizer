@@ -16,6 +16,7 @@ interface ChordAnalyzerBadgeProps {
   showExtensions?: boolean;
   mutedNotes?: Set<string>;
   onToggleNote?: (note: string) => void;
+  pinnedChord?: { root: string; quality: string } | null;
 }
 
 export function ChordAnalyzerBadge({
@@ -28,6 +29,7 @@ export function ChordAnalyzerBadge({
   showExtensions = true,
   mutedNotes,
   onToggleNote,
+  pinnedChord = null,
 }: ChordAnalyzerBadgeProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -66,18 +68,29 @@ export function ChordAnalyzerBadge({
     }
   })();
 
-  // Build the "Also" list: swap original primary in when overridden
-  const alsoList = isOverridden
+  // Build the "Also" list: all detected alternatives, with the original primary
+  // swapped in when overridden, and the active Move-To target pinned at the top.
+  type AlsoItem = { chord: ChordName; isDetected: boolean; isPinned: boolean };
+  const detectedAlso: AlsoItem[] = isOverridden
     ? [
-        { chord: primary, isDetected: true },
+        { chord: primary, isDetected: true, isPinned: false },
         ...alternatives
           .filter(alt => alt.display !== overrideChord.display)
-          .slice(0, 2)
-          .map(alt => ({ chord: alt as ChordName, isDetected: false })),
+          .map(alt => ({ chord: alt as ChordName, isDetected: false, isPinned: false })),
       ]
-    : alternatives
-        .slice(0, 3)
-        .map(alt => ({ chord: alt as ChordName, isDetected: false }));
+    : alternatives.map(alt => ({ chord: alt as ChordName, isDetected: false, isPinned: false }));
+
+  const pinnedItem: AlsoItem | null = (() => {
+    if (!pinnedChord) return null;
+    const display = `${pinnedChord.root}${pinnedChord.quality}`;
+    // Skip if it's already the chord shown in the headline.
+    if (display === displayedChord.display) return null;
+    return { chord: { root: pinnedChord.root, quality: pinnedChord.quality, display }, isDetected: false, isPinned: true };
+  })();
+
+  const alsoList: AlsoItem[] = pinnedItem
+    ? [pinnedItem, ...detectedAlso.filter(item => item.chord.display !== pinnedItem.chord.display)]
+    : detectedAlso;
 
   return (
     <div
@@ -167,6 +180,9 @@ export function ChordAnalyzerBadge({
               {item.chord.display}
               {item.isDetected && (
                 <span className="text-gray-600 ml-1">(detected)</span>
+              )}
+              {item.isPinned && (
+                <span className="text-cyan-500/70 ml-1">(Move To)</span>
               )}
             </div>
           ))}

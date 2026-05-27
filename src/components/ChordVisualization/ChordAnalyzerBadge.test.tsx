@@ -61,6 +61,22 @@ describe('ChordAnalyzerBadge', () => {
     expect(degreeSpan.getAttribute('style')).toContain('rgb(107, 114, 128)');
   });
 
+  it('pins the Move-To target in the Also list labeled (Move To)', () => {
+    const onChordOverride = vi.fn();
+    const { getByText } = render(
+      <ChordAnalyzerBadge
+        detection={mockDetection}
+        fret={3}
+        pinnedChord={{ root: 'A', quality: 'maj' }}
+        onChordOverride={onChordOverride}
+      />
+    );
+    const pinned = getByText('Amaj').closest('div') as HTMLElement;
+    expect(pinned.textContent).toContain('(Move To)');
+    fireEvent.click(pinned);
+    expect(onChordOverride).toHaveBeenCalledWith({ root: 'A', quality: 'maj', display: 'Amaj' });
+  });
+
   it('hides extensions entirely when showExtensions is false', () => {
     const { queryByText } = render(
       <ChordAnalyzerBadge detection={mockDetection} fret={0} showExtensions={false} />
