@@ -26,11 +26,18 @@ export function ChordFinderOverlay({
   return (
     <g>
       {Array.from(byFret.entries()).map(([fret, voicing]) => {
-        const x1 = fret === 0 ? 0 : getFretX(fret, fretboardWidth);
-        const x2 = getFretX(fret + 1, fretboardWidth);
+        // Notes sit ON the fret line (the bar position), so center the band
+        // on that line — half a fret-width on each side — rather than spanning
+        // the gap to the right of the dots.
+        const center = getFretX(fret, fretboardWidth);
+        const half = (getFretX(fret + 1, fretboardWidth) - getFretX(fret, fretboardWidth)) / 2;
+        const x1 = Math.max(0, center - half);
+        const x2 = center + half;
         const noPedals = voicing.engagedControls.length === 0;
         const opacity = noPedals ? 0.6 : 0.35;
         const dashArray = noPedals ? 'none' : '4,3';
+
+        const labelWidth = 80;
 
         return (
           <g key={`finder-${fret}`}>
@@ -50,13 +57,14 @@ export function ChordFinderOverlay({
             />
             {!noPedals && (
               <foreignObject
-                x={leftMargin + x1}
+                x={leftMargin + center - labelWidth / 2}
                 y={fretboardHeight + 2}
-                width={x2 - x1}
+                width={labelWidth}
                 height={18}
+                overflow="visible"
               >
                 <div className="text-center">
-                  <span className="text-[8px] text-red-500 bg-red-500/20 rounded px-1">
+                  <span className="text-[8px] text-red-500 bg-red-500/20 rounded px-1 whitespace-nowrap">
                     + {voicing.engagedControls.join(', ')}
                   </span>
                 </div>

@@ -34,6 +34,10 @@ export const CHORD_DICTIONARY: ChordDefinition[] = [
   { quality: '7b9', intervals: [0, 4, 7, 10, 13] },
   { quality: '7#11', intervals: [0, 4, 7, 10, 18] },
   { quality: 'maj7#11', intervals: [0, 4, 7, 11, 18] },
+  // Altered fifths (the b5/#5 is a chord tone, not an extension)
+  { quality: '7b5', intervals: [0, 4, 6, 10] },
+  { quality: 'maj7b5', intervals: [0, 4, 6, 11] },
+  { quality: 'maj7#5', intervals: [0, 4, 8, 11] },
 ];
 
 /** Map from interval (semitones from root, mod 12) to chord function label */

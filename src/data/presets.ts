@@ -94,4 +94,76 @@ export const C6_PRESET: Copedent = {
   ],
 }
 
-export const PRESETS: Copedent[] = [E9_PRESET, C6_PRESET]
+// Standard E9/B6 Universal copedent (14-string, 8 pedals, 6 knee levers).
+// Transcribed from Gabe's Sierra Universal chart ("Standard on Universal 12 & 14's").
+// Open tuning (1 high -> 14 low): G# F# D# G# E B G# F# E B G# E B E
+// Octaves are approximate (note names / pitch classes are exact).
+// Knee levers map the chart's L / V / lock / R / L / R columns to:
+// LKL, LKV, VLOCK, RKR, RKL, RKR2.
+export const E9B6_UNIVERSAL_PRESET: Copedent = {
+  id: 'preset-e9b6-universal',
+  name: 'E9/B6 Universal',
+  pedals: ['1', '2', '3', '4', '5', '6', '7', '8'],
+  kneeLevers: ['LKL', 'LKV', 'VLOCK', 'RKR', 'RKL', 'RKR2'],
+  strings: [
+    { number: 1, openNote: 'G#4', changes: [] },
+    { number: 2, openNote: 'F#4', changes: [
+      { control: '5', semitones: 1 },
+      { control: 'LKV', semitones: 1 },
+    ]},
+    { number: 3, openNote: 'D#4', changes: [
+      { control: 'RKR2', semitones: -1 },
+    ]},
+    { number: 4, openNote: 'G#4', changes: [
+      { control: '2', semitones: 1 },
+    ]},
+    { number: 5, openNote: 'E4', changes: [
+      { control: '3', semitones: 2 },
+      { control: '6', semitones: -1 },
+      { control: 'LKL', semitones: 1 },
+      { control: 'VLOCK', semitones: -1 },
+      { control: 'RKR', semitones: -1 },
+    ]},
+    { number: 6, openNote: 'B3', changes: [
+      { control: '1', semitones: 2 },
+      { control: '3', semitones: 2 },
+      { control: '7', semitones: 2 },
+      { control: 'RKL', semitones: -1 },
+    ]},
+    { number: 7, openNote: 'G#3', changes: [
+      { control: '2', semitones: 1 },
+      { control: '4', semitones: 2 },
+      { control: '7', semitones: 2 },
+    ]},
+    { number: 8, openNote: 'F#3', changes: [
+      { control: '5', semitones: -1 },
+      { control: 'LKV', semitones: 1 },
+    ]},
+    { number: 9, openNote: 'E3', changes: [
+      { control: '6', semitones: -2 },
+      { control: 'LKL', semitones: 1 },
+      { control: 'VLOCK', semitones: -1 },
+      { control: 'RKR', semitones: -1 },
+    ]},
+    { number: 10, openNote: 'B2', changes: [
+      { control: '1', semitones: 2 },
+      { control: '8', semitones: 1 },
+      { control: 'RKR2', semitones: 3 },
+    ]},
+    { number: 11, openNote: 'G#2', changes: [
+      { control: '2', semitones: 1 },
+      { control: '4', semitones: 2 },
+    ]},
+    { number: 12, openNote: 'E2', changes: [
+      { control: '5', semitones: 1 },
+      { control: '8', semitones: -1 },
+    ]},
+    { number: 13, openNote: 'B1', changes: [
+      { control: '5', semitones: 2 },
+      { control: '8', semitones: -3 },
+    ]},
+    { number: 14, openNote: 'E1', changes: [] },
+  ],
+}
+
+export const PRESETS: Copedent[] = [E9_PRESET, C6_PRESET, E9B6_UNIVERSAL_PRESET]

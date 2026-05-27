@@ -9,7 +9,7 @@ beforeEach(() => {
 describe('useCopedentState', () => {
   it('initializes with presets', () => {
     const { result } = renderHook(() => useCopedentState())
-    expect(result.current.copedents).toHaveLength(2)
+    expect(result.current.copedents).toHaveLength(3)
     expect(result.current.activeCopedent.name).toBe('Emmons E9')
   })
 
@@ -55,15 +55,15 @@ describe('useCopedentState', () => {
   it('duplicates a copedent', () => {
     const { result } = renderHook(() => useCopedentState())
     act(() => result.current.duplicateCopedent(result.current.copedents[0].id))
-    expect(result.current.copedents).toHaveLength(3)
-    expect(result.current.copedents[2].name).toContain('Copy')
+    expect(result.current.copedents).toHaveLength(4)
+    expect(result.current.copedents[3].name).toContain('Copy')
   })
 
   it('deletes a copedent', () => {
     const { result } = renderHook(() => useCopedentState())
     const e9Id = result.current.copedents[0].id
     act(() => result.current.deleteCopedent(e9Id))
-    expect(result.current.copedents).toHaveLength(1)
+    expect(result.current.copedents).toHaveLength(2)
   })
 
   it('does not delete last copedent', () => {
@@ -87,7 +87,7 @@ describe('useCopedentState', () => {
       strings: [{ number: 1, openNote: 'E4', changes: [] }],
     }
     act(() => result.current.createCopedent(newCop))
-    expect(result.current.copedents).toHaveLength(3)
+    expect(result.current.copedents).toHaveLength(4)
     expect(result.current.activeCopedent.name).toBe('Custom')
   })
 })

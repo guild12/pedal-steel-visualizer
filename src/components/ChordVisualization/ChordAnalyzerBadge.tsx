@@ -4,6 +4,7 @@ import type { ColorTheme } from '../../types';
 import { resolveChordColor } from '../../utils/chordFunctionColors';
 import { getChordTones, noteNameToSemitone } from '../../utils/chordDetection';
 import { INTERVAL_TO_FUNCTION } from '../../utils/chordDictionary';
+import { NOTE_NAMES } from '../../utils/noteUtils';
 
 interface ChordAnalyzerBadgeProps {
   detection: ChordDetectionResult | null;
@@ -51,8 +52,9 @@ export function ChordAnalyzerBadge({
         // Convert function label to degree display: 'root'→'1', '3rd'→'3', '5th'→'5', etc.
         const degree = fn === 'root' ? '1'
           : fn.replace(/(st|nd|rd|th)$/, '');
-        return { degree, fn };
-      }).filter(Boolean) as { degree: string; fn: string }[];
+        const note = NOTE_NAMES[((s % 12) + 12) % 12];
+        return { degree, fn, note };
+      }).filter(Boolean) as { degree: string; fn: string; note: string }[];
     } catch {
       return [];
     }
@@ -94,26 +96,36 @@ export function ChordAnalyzerBadge({
           <span className="text-[10px] text-gray-500">(selected)</span>
         )}
         {extensions.length > 0 && (
-          <span className="text-sm font-semibold flex gap-1.5">
-            +
-            {extensions.map((e, i) => (
-              <span key={i} style={{ color: resolveChordColor(e.split(' ')[0], colorTheme, true) ?? '#F4A261' }}>
-                {e.split(' ')[0]}
-              </span>
-            ))}
+          <span className="text-sm font-semibold flex items-start gap-1.5">
+            <span className="leading-tight">+</span>
+            {extensions.map((e, i) => {
+              const label = e.split(' ')[0];
+              const note = e.match(/\(([^)]+)\)/)?.[1] ?? '';
+              return (
+                <span
+                  key={i}
+                  className="flex flex-col items-center leading-tight"
+                  style={{ color: resolveChordColor(label, colorTheme, true) ?? '#F4A261' }}
+                >
+                  <span>{label}</span>
+                  {note && <span className="text-[10px] font-mono opacity-90">{note}</span>}
+                </span>
+              );
+            })}
           </span>
         )}
       </div>
 
       {chordDegrees.length > 0 && (
-        <div className="flex gap-2 mt-1">
+        <div className="flex gap-2.5 mt-1">
           {chordDegrees.map((d, i) => (
             <span
               key={i}
-              className="text-xs font-semibold"
+              className="flex flex-col items-center leading-tight"
               style={{ color: resolveChordColor(d.fn, colorTheme) ?? '#888' }}
             >
-              {d.degree}
+              <span className="text-xs font-semibold">{d.degree}</span>
+              <span className="text-[10px] font-mono opacity-90">{d.note}</span>
             </span>
           ))}
         </div>

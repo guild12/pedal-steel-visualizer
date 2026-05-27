@@ -37,7 +37,7 @@ export function ChangesMatrix({ copedent, onUpdate }: ChangesMatrixProps) {
         <table className="text-sm">
           <thead>
             <tr>
-              <th className="px-2 py-1 text-gray-500 text-left">Str</th>
+              <th className="px-2 py-1 text-gray-500 text-left sticky left-0 z-20 bg-gray-900">Str</th>
               {allControls.map(c => (
                 <th key={c} className="px-2 py-1 text-gray-400 text-center">{c}</th>
               ))}
@@ -46,7 +46,7 @@ export function ChangesMatrix({ copedent, onUpdate }: ChangesMatrixProps) {
           <tbody>
             {copedent.strings.map((s, si) => (
               <tr key={si}>
-                <td className="px-2 py-1 text-gray-500">{s.number}</td>
+                <td className="px-2 py-1 text-gray-500 sticky left-0 z-10 bg-gray-900">{s.number}</td>
                 {allControls.map(control => (
                   <td key={control} className="px-1 py-1">
                     <input

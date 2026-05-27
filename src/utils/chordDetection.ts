@@ -155,10 +155,22 @@ export function getExtensions(root: string, quality: string, pitchClasses: numbe
   }
 
   const chordIntervalsMod12 = chordDef.intervals.map((iv: number) => iv % 12);
+  const has = (iv: number) => chordIntervalsMod12.includes(iv);
+
+  // Suppress extensions that clash with a chord tone of the same scale degree.
+  // e.g. don't list b3 against a natural 3rd, or b5/#5 against a perfect 5th.
+  // (3rd family: b3=3 / 3=4 ; 5th family: b5=6 / 5=7 / #5=8)
+  const suppressed = new Set<number>();
+  if (has(4)) suppressed.add(3);            // natural 3rd present → hide b3
+  if (has(3)) suppressed.add(4);            // minor 3rd present → hide natural 3
+  if (has(7)) { suppressed.add(6); suppressed.add(8); } // perfect 5th present → hide b5/#5
+  if (has(6)) suppressed.add(7);            // diminished 5th present → hide natural 5
+  if (has(8)) suppressed.add(7);            // augmented 5th present → hide natural 5
+
   const extensions: string[] = [];
 
   for (const interval of intervals) {
-    if (!chordIntervalsMod12.includes(interval) && interval !== 0) {
+    if (!chordIntervalsMod12.includes(interval) && interval !== 0 && !suppressed.has(interval)) {
       const noteName = NOTE_NAMES[(rootSemitone + interval) % 12];
       const label = getIntervalLabel(interval);
       extensions.push(`${label} (${noteName})`);

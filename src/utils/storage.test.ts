@@ -10,9 +10,10 @@ beforeEach(() => {
 describe('loadCopedents', () => {
   it('returns presets when storage is empty', () => {
     const result = loadCopedents()
-    expect(result).toHaveLength(2)
+    expect(result).toHaveLength(3)
     expect(result[0].name).toBe('Emmons E9')
     expect(result[1].name).toBe('Emmons C6')
+    expect(result[2].name).toBe('E9/B6 Universal')
   })
   it('returns saved copedents when storage has data', () => {
     const custom: Copedent = {
@@ -27,7 +28,7 @@ describe('loadCopedents', () => {
   it('returns presets when storage has invalid JSON', () => {
     localStorage.setItem(STORAGE_KEY, 'not json')
     const result = loadCopedents()
-    expect(result).toHaveLength(2)
+    expect(result).toHaveLength(3)
   })
 })
 
