@@ -155,7 +155,8 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
           {/* Selected fret highlight — vertical strip centered on fret line */}
           {selectedFret != null && (() => {
             const cx = LEFT_MARGIN + getFretX(selectedFret, fretboardWidth);
-            const barWidth = Math.min((fretboardWidth / TOTAL_FRETS) * 0.7, 24);
+            // Wide enough to clear the ~22px note circles with breathing room.
+            const barWidth = Math.min((fretboardWidth / TOTAL_FRETS) * 0.95, 38);
             const r = barWidth / 2;
             const left = cx - r;
             const right = cx + r;
