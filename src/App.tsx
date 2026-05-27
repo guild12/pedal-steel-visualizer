@@ -5,7 +5,7 @@ import { CopedentManager } from './components/CopedentManager/CopedentManager'
 import { CopedentEditor } from './components/CopedentEditor/CopedentEditor'
 import { useCopedentState } from './hooks/useCopedentState'
 import { useChordState } from './hooks/useChordState'
-import { detectChord, getChordTones, getExtensions, noteNameToSemitone } from './utils/chordDetection'
+import { detectChord, getChordTones, getExtensions, noteNameToSemitone, parseExtension } from './utils/chordDetection'
 import { findVoicings } from './utils/voicingSearch'
 import { findTransitions } from './utils/transitionScoring'
 import { calculateFretNote, NOTE_NAMES } from './utils/noteUtils'
@@ -76,9 +76,9 @@ function App() {
 
     // Extension tones — always marked as extensions
     for (const ext of activeExtensions) {
-      const match = ext.match(/^([b#]?\d+)\s+\(([A-G]#?)\)/);
-      if (match) {
-        map.set(match[2], { fn: match[1], isExtension: true });
+      const parsed = parseExtension(ext);
+      if (parsed) {
+        map.set(parsed.note, { fn: parsed.label, isExtension: true });
       }
     }
 

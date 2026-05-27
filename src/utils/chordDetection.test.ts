@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { detectChord, parseChordName } from './chordDetection';
+import { detectChord, parseChordName, parseExtension, getExtensions } from './chordDetection';
+
+// Pitch-class numbers: C=0 C#=1 D=2 D#=3 E=4 F=5 F#=6 G=7 G#=8 A=9 A#=10 B=11
 
 describe('detectChord', () => {
   it('detects a C major triad', () => {
@@ -114,5 +116,62 @@ describe('parseChordName', () => {
   it('returns null for invalid input', () => {
     expect(parseChordName('')).toBeNull();
     expect(parseChordName('xyz')).toBeNull();
+  });
+});
+
+describe('parseExtension', () => {
+  it('parses ordinal labels (the previously-broken case)', () => {
+    expect(parseExtension('4th (G)')).toEqual({ label: '4th', note: 'G' });
+    expect(parseExtension('6th (A)')).toEqual({ label: '6th', note: 'A' });
+  });
+
+  it('parses numeric and altered labels', () => {
+    expect(parseExtension('9 (D)')).toEqual({ label: '9', note: 'D' });
+    expect(parseExtension('b9 (F)')).toEqual({ label: 'b9', note: 'F' });
+    expect(parseExtension('#11 (A#)')).toEqual({ label: '#11', note: 'A#' });
+  });
+
+  it('returns null for malformed input', () => {
+    expect(parseExtension('garbage')).toBeNull();
+    expect(parseExtension('')).toBeNull();
+  });
+});
+
+describe('getExtensions altered-tension relabeling', () => {
+  it('relabels b5 over a perfect 5th as #11 (E7 + Bb, keeps natural B)', () => {
+    // E G# B D + Bb
+    const { extensions } = getExtensions('E', '7', [4, 8, 11, 2, 10]);
+    expect(extensions).toContain('#11 (A#)');
+    expect(extensions.some(e => e.startsWith('b5'))).toBe(false);
+  });
+
+  it('relabels b3 over a natural 3rd as #9 (E7 + G)', () => {
+    // E G# B D + G
+    const { extensions } = getExtensions('E', '7', [4, 8, 11, 2, 7]);
+    expect(extensions).toContain('#9 (G)');
+  });
+
+  it('relabels #5 over a perfect 5th as b13 (E7 + C)', () => {
+    // E G# B D + C
+    const { extensions } = getExtensions('E', '7', [4, 8, 11, 2, 0]);
+    expect(extensions).toContain('b13 (C)');
+  });
+
+  it('does not list the b5 as an extension when it is a chord tone (E7b5)', () => {
+    // E G# Bb D — b5 is part of the 7b5 quality
+    const { extensions } = getExtensions('E', '7b5', [4, 8, 10, 2]);
+    expect(extensions).toEqual([]);
+  });
+
+  it('relabels a raised 4th over a major triad as #11 on any chord (Cmaj + F#)', () => {
+    // C E G + F#
+    const { extensions } = getExtensions('C', 'maj', [0, 4, 7, 6]);
+    expect(extensions).toContain('#11 (F#)');
+  });
+
+  it('hides a natural 3 over a minor 3 (no standard tension name)', () => {
+    // E G B (Emin) + G#
+    const { extensions } = getExtensions('E', 'min', [4, 7, 11, 8]);
+    expect(extensions).toEqual([]);
   });
 });

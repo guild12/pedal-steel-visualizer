@@ -157,27 +157,41 @@ export function getExtensions(root: string, quality: string, pitchClasses: numbe
   const chordIntervalsMod12 = chordDef.intervals.map((iv: number) => iv % 12);
   const has = (iv: number) => chordIntervalsMod12.includes(iv);
 
-  // Suppress extensions that clash with a chord tone of the same scale degree.
-  // e.g. don't list b3 against a natural 3rd, or b5/#5 against a perfect 5th.
-  // (3rd family: b3=3 / 3=4 ; 5th family: b5=6 / 5=7 / #5=8)
-  const suppressed = new Set<number>();
-  if (has(4)) suppressed.add(3);            // natural 3rd present → hide b3
-  if (has(3)) suppressed.add(4);            // minor 3rd present → hide natural 3
-  if (has(7)) { suppressed.add(6); suppressed.add(8); } // perfect 5th present → hide b5/#5
-  if (has(6)) suppressed.add(7);            // diminished 5th present → hide natural 5
-  if (has(8)) suppressed.add(7);            // augmented 5th present → hide natural 5
+  // An altered note that coexists with the natural chord tone of the same scale
+  // degree is really an upper-structure tension, not a clash. Relabel it (and keep
+  // it). The one case with no standard tension name — a natural 3 over a minor 3 —
+  // is hidden (returns null). Anything else uses its normal label (undefined).
+  const relabelClash = (iv: number): string | null | undefined => {
+    if (iv === 3 && has(4)) return '#9';   // b3 over a natural 3rd
+    if (iv === 6 && has(7)) return '#11';  // b5 over a perfect 5th
+    if (iv === 8 && has(7)) return 'b13';  // #5 over a perfect 5th
+    if (iv === 4 && has(3)) return null;   // natural 3 over a minor 3 — no name, hide
+    return undefined;                      // not a clash — use normal label
+  };
 
   const extensions: string[] = [];
 
   for (const interval of intervals) {
-    if (!chordIntervalsMod12.includes(interval) && interval !== 0 && !suppressed.has(interval)) {
-      const noteName = NOTE_NAMES[(rootSemitone + interval) % 12];
-      const label = getIntervalLabel(interval);
-      extensions.push(`${label} (${noteName})`);
-    }
+    if (chordIntervalsMod12.includes(interval) || interval === 0) continue;
+    const relabeled = relabelClash(interval);
+    if (relabeled === null) continue; // hidden edge case (maj3 over min3)
+    const noteName = NOTE_NAMES[(rootSemitone + interval) % 12];
+    const label = relabeled ?? getIntervalLabel(interval);
+    extensions.push(`${label} (${noteName})`);
   }
 
   return { extensions };
+}
+
+/**
+ * Parse a formatted extension string like "9 (D)", "4th (G)", or "#11 (A#)"
+ * into its label and note. Returns null when it doesn't match the format.
+ * The label is any non-space token, so ordinal labels (4th, 6th) parse too.
+ */
+export function parseExtension(ext: string): { label: string; note: string } | null {
+  const match = ext.match(/^(\S+)\s+\(([A-G][#b]?)\)/);
+  if (!match) return null;
+  return { label: match[1], note: match[2] };
 }
 
 const QUALITY_ALIASES: Record<string, string> = {
