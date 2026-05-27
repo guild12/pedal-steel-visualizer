@@ -40,10 +40,21 @@ describe('CopedentManager', () => {
     expect(onDup).toHaveBeenCalledWith(E9_PRESET.id)
   })
 
-  it('calls onDelete with active copedent id', async () => {
+  it('calls onDelete with active copedent id after confirmation', async () => {
     const onDel = vi.fn()
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
     render(<CopedentManager {...defaultProps} onDelete={onDel} />)
     await userEvent.click(screen.getByRole('button', { name: /delete/i }))
     expect(onDel).toHaveBeenCalledWith(E9_PRESET.id)
+    confirmSpy.mockRestore()
+  })
+
+  it('does not delete when confirmation is cancelled', async () => {
+    const onDel = vi.fn()
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
+    render(<CopedentManager {...defaultProps} onDelete={onDel} />)
+    await userEvent.click(screen.getByRole('button', { name: /delete/i }))
+    expect(onDel).not.toHaveBeenCalled()
+    confirmSpy.mockRestore()
   })
 })

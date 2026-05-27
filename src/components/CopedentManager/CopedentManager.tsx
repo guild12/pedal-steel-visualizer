@@ -19,6 +19,13 @@ export function CopedentManager({
 }: CopedentManagerProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const handleDelete = () => {
+    const name = copedents.find(c => c.id === activeCopedentId)?.name ?? 'this copedent'
+    if (window.confirm(`Delete "${name}"? (Built-in presets will reappear on reload.)`)) {
+      onDelete(activeCopedentId)
+    }
+  }
+
   const handleFileLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -92,8 +99,9 @@ export function CopedentManager({
         className="hidden"
       />
       <button
-        onClick={() => onDelete(activeCopedentId)}
-        className="px-3 py-1.5 text-sm bg-red-900 text-red-300 border border-red-700 rounded hover:bg-red-800"
+        onClick={handleDelete}
+        title="Delete the selected copedent"
+        className="ml-4 px-2 py-1.5 text-xs bg-gray-800 text-gray-500 border border-gray-700 rounded hover:bg-red-900 hover:text-red-300 hover:border-red-700"
       >
         Delete
       </button>
