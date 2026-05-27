@@ -9,7 +9,6 @@ import { NOTE_NAMES } from '../../utils/noteUtils';
 interface ChordAnalyzerBadgeProps {
   detection: ChordDetectionResult | null;
   fret: number | null;
-  hasEngagedControls: boolean;
   colorTheme?: ColorTheme;
   overrideChord?: ChordName | null;
   onChordOverride?: (chord: ChordName | null) => void;
@@ -19,7 +18,6 @@ interface ChordAnalyzerBadgeProps {
 export function ChordAnalyzerBadge({
   detection,
   fret,
-  hasEngagedControls,
   colorTheme = 'chordTones',
   overrideChord = null,
   onChordOverride,

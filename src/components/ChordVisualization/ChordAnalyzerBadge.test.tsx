@@ -13,28 +13,28 @@ const mockDetection = {
 describe('ChordAnalyzerBadge', () => {
   it('renders chord name', () => {
     const { getByText } = render(
-      <ChordAnalyzerBadge detection={mockDetection} fret={0} hasEngagedControls={false} />
+      <ChordAnalyzerBadge detection={mockDetection} fret={0} />
     );
     expect(getByText('Emaj')).toBeTruthy();
   });
 
   it('shows fret label', () => {
     const { getByText } = render(
-      <ChordAnalyzerBadge detection={mockDetection} fret={3} hasEngagedControls={false} />
+      <ChordAnalyzerBadge detection={mockDetection} fret={3} />
     );
     expect(getByText(/FRET 3/)).toBeTruthy();
   });
 
   it('shows OPEN STRINGS when fret is 0 or null', () => {
     const { getByText } = render(
-      <ChordAnalyzerBadge detection={mockDetection} fret={null} hasEngagedControls={false} />
+      <ChordAnalyzerBadge detection={mockDetection} fret={null} />
     );
     expect(getByText(/OPEN STRINGS/)).toBeTruthy();
   });
 
   it('renders chord name in root color (cyan) with default theme', () => {
     const { container } = render(
-      <ChordAnalyzerBadge detection={mockDetection} fret={0} hasEngagedControls={true} />
+      <ChordAnalyzerBadge detection={mockDetection} fret={0} />
     );
     const chordName = container.querySelector('span[style]');
     expect(chordName?.getAttribute('style')).toContain('rgb(0, 229, 208)');
@@ -42,7 +42,7 @@ describe('ChordAnalyzerBadge', () => {
 
   it('renders chord name in cyan with rootFocus theme', () => {
     const { container } = render(
-      <ChordAnalyzerBadge detection={mockDetection} fret={0} hasEngagedControls={true} colorTheme="rootFocus" />
+      <ChordAnalyzerBadge detection={mockDetection} fret={0} colorTheme="rootFocus" />
     );
     const chordName = container.querySelector('span[style]');
     expect(chordName?.getAttribute('style')).toContain('rgb(0, 229, 208)');
@@ -50,14 +50,14 @@ describe('ChordAnalyzerBadge', () => {
 
   it('shows extensions when present', () => {
     const { getByText } = render(
-      <ChordAnalyzerBadge detection={mockDetection} fret={0} hasEngagedControls={false} />
+      <ChordAnalyzerBadge detection={mockDetection} fret={0} />
     );
     expect(getByText(/9/)).toBeTruthy();
   });
 
   it('shows alternatives always visible', () => {
     const { getByText } = render(
-      <ChordAnalyzerBadge detection={mockDetection} fret={0} hasEngagedControls={false} />
+      <ChordAnalyzerBadge detection={mockDetection} fret={0} />
     );
     expect(getByText('C#min')).toBeTruthy();
   });
@@ -67,9 +67,7 @@ describe('ChordAnalyzerBadge', () => {
     const { getByText } = render(
       <ChordAnalyzerBadge
         detection={mockDetection}
-        fret={3}
-        hasEngagedControls={true}
-        onChordOverride={onOverride}
+        fret={3}        onChordOverride={onOverride}
       />
     );
     fireEvent.click(getByText('C#min'));
@@ -82,9 +80,7 @@ describe('ChordAnalyzerBadge', () => {
     const { getByText } = render(
       <ChordAnalyzerBadge
         detection={mockDetection}
-        fret={3}
-        hasEngagedControls={true}
-        overrideChord={{ root: 'C#', quality: 'min', display: 'C#min' }}
+        fret={3}        overrideChord={{ root: 'C#', quality: 'min', display: 'C#min' }}
       />
     );
     expect(getByText('C#min')).toBeTruthy();
@@ -94,9 +90,7 @@ describe('ChordAnalyzerBadge', () => {
     const { getByText } = render(
       <ChordAnalyzerBadge
         detection={mockDetection}
-        fret={3}
-        hasEngagedControls={true}
-        overrideChord={{ root: 'C#', quality: 'min', display: 'C#min' }}
+        fret={3}        overrideChord={{ root: 'C#', quality: 'min', display: 'C#min' }}
       />
     );
     expect(getByText('(selected)')).toBeTruthy();
@@ -106,9 +100,7 @@ describe('ChordAnalyzerBadge', () => {
     const { getByText } = render(
       <ChordAnalyzerBadge
         detection={mockDetection}
-        fret={3}
-        hasEngagedControls={true}
-        overrideChord={{ root: 'C#', quality: 'min', display: 'C#min' }}
+        fret={3}        overrideChord={{ root: 'C#', quality: 'min', display: 'C#min' }}
         onChordOverride={vi.fn()}
       />
     );
@@ -120,9 +112,7 @@ describe('ChordAnalyzerBadge', () => {
     const { getByText } = render(
       <ChordAnalyzerBadge
         detection={mockDetection}
-        fret={3}
-        hasEngagedControls={true}
-        overrideChord={{ root: 'C#', quality: 'min', display: 'C#min' }}
+        fret={3}        overrideChord={{ root: 'C#', quality: 'min', display: 'C#min' }}
         onChordOverride={vi.fn()}
       />
     );
@@ -134,9 +124,7 @@ describe('ChordAnalyzerBadge', () => {
     const { getByText } = render(
       <ChordAnalyzerBadge
         detection={mockDetection}
-        fret={3}
-        hasEngagedControls={true}
-        overrideChord={{ root: 'C#', quality: 'min', display: 'C#min' }}
+        fret={3}        overrideChord={{ root: 'C#', quality: 'min', display: 'C#min' }}
         onChordOverride={onOverride}
       />
     );

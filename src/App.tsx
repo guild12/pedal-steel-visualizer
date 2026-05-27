@@ -202,7 +202,6 @@ function App() {
         <ChordAnalyzerBadge
           detection={currentDetection}
           fret={chordState.selectedFret}
-          hasEngagedControls={state.engagedControls.size > 0}
           colorTheme={state.colorTheme}
           overrideChord={overrideChord}
           onChordOverride={setOverrideChord}
