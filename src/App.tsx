@@ -161,6 +161,7 @@ function App() {
         chordState.selectFret(null)
         chordState.deactivateChordFinder()
         chordState.deactivateTransition()
+        chordState.deactivateMoveTo()
         return
       }
       const num = parseInt(e.key, 10)
