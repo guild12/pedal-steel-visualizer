@@ -1,3 +1,4 @@
+import type { JSX } from 'react'
 import type { StringConfig } from '../../types'
 import { getStringY, getStringThickness } from '../../utils/fretUtils'
 import { getControlColor } from '../../utils/controlColors'
@@ -12,14 +13,17 @@ interface StringLinesProps {
 const DASH = 12
 
 export function StringLines({ strings, engagedControls, fretboardHeight, totalWidth }: StringLinesProps) {
-  const lines: React.JSX.Element[] = []
+  const lines: JSX.Element[] = []
 
   strings.forEach((s, i) => {
     const y = getStringY(i, strings.length, fretboardHeight)
     const thickness = getStringThickness(i, strings.length)
-    const affecting = s.changes
-      .map(c => c.control)
-      .filter(control => engagedControls.has(control))
+    // Dedupe in case a string lists the same control twice (user-created copedent).
+    const affecting = [...new Set(
+      s.changes
+        .map(c => c.control)
+        .filter(control => engagedControls.has(control))
+    )]
 
     if (affecting.length === 0) {
       lines.push(

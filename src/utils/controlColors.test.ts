@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getControlColor } from './controlColors'
+import { getControlColor, readableTextColor } from './controlColors'
 
 describe('getControlColor', () => {
   it('returns the fixed color for known control names', () => {
@@ -17,5 +17,17 @@ describe('getControlColor', () => {
     const first = getControlColor('ZZZ')
     expect(first).toMatch(/^#[0-9A-Fa-f]{6}$/)
     expect(getControlColor('ZZZ')).toBe(first)
+  })
+})
+
+describe('readableTextColor', () => {
+  it('uses dark text on light backgrounds', () => {
+    expect(readableTextColor('#FFD166')).toBe('#1a1a1a') // light yellow
+    expect(readableTextColor('#FFBE0B')).toBe('#1a1a1a') // amber
+  })
+
+  it('uses white text on dark/saturated backgrounds', () => {
+    expect(readableTextColor('#E63946')).toBe('#fff') // red
+    expect(readableTextColor('#4895EF')).toBe('#fff') // blue
   })
 })
