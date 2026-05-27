@@ -80,6 +80,14 @@ describe('useCopedentState', () => {
     expect(result.current.copedents[0].name).toBe('My E9')
   })
 
+  it('sets engaged controls wholesale via setControls', () => {
+    const { result } = renderHook(() => useCopedentState())
+    act(() => result.current.setControls(['A', 'B']))
+    expect(result.current.engagedControls).toEqual(new Set(['A', 'B']))
+    act(() => result.current.setControls([]))
+    expect(result.current.engagedControls).toEqual(new Set())
+  })
+
   it('creates a new copedent and switches to it', () => {
     const { result } = renderHook(() => useCopedentState())
     const newCop = {

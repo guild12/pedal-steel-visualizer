@@ -44,6 +44,10 @@ export function useCopedentState() {
     setEngagedControls(new Set())
   }, [])
 
+  const setControls = useCallback((controls: string[]) => {
+    setEngagedControls(new Set(controls))
+  }, [])
+
   const updateCopedent = useCallback((id: string, updates: Partial<Copedent>) => {
     setCopedents(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c))
   }, [])
@@ -90,6 +94,7 @@ export function useCopedentState() {
     setActiveCopedentId: switchCopedent,
     toggleControl,
     clearAllControls,
+    setControls,
     setDisplayMode,
     setSelectedKey,
     setColorTheme,
