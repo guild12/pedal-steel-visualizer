@@ -155,20 +155,22 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
           {/* Selected fret highlight — vertical strip centered on fret line */}
           {selectedFret != null && (() => {
             const cx = LEFT_MARGIN + getFretX(selectedFret, fretboardWidth);
-            const halfGap = (fretboardWidth / TOTAL_FRETS) / 2;
+            const barWidth = Math.min((fretboardWidth / TOTAL_FRETS) * 0.7, 24);
+            const r = barWidth / 2;
+            const left = cx - r;
+            const right = cx + r;
+            // Tone-bar shape: domed (rounded) top, straight sides, flat bottom —
+            // marks where the bar sits for this "Chord at Fret".
+            const d = `M ${left} ${r} A ${r} ${r} 0 0 1 ${right} ${r} L ${right} ${FRETBOARD_HEIGHT} L ${left} ${FRETBOARD_HEIGHT} Z`;
             return (
-              <rect
-                x={cx - halfGap}
-                y={0}
-                width={halfGap * 2}
-                height={FRETBOARD_HEIGHT}
-                rx={4}
+              <path
+                d={d}
                 fill="#00E5D0"
-                fillOpacity={0.08}
+                fillOpacity={0.1}
                 stroke="#00E5D0"
-                strokeOpacity={0.4}
-                strokeWidth={2}
-                strokeDasharray="4,3"
+                strokeOpacity={0.9}
+                strokeWidth={2.5}
+                strokeLinejoin="round"
                 pointerEvents="none"
               />
             );

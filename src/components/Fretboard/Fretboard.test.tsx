@@ -53,6 +53,20 @@ describe('Fretboard', () => {
     expect(highlighted.length).toBe(0)
   })
 
+  it('renders a solid tone-bar shape at the selected fret', () => {
+    const { container } = render(<Fretboard {...defaultProps} selectedFret={5} />)
+    const bar = container.querySelector('path[d^="M"]')
+    expect(bar).toBeTruthy()
+    // It's a solid outline now, not the old dashed strip.
+    expect(bar?.getAttribute('stroke-dasharray')).toBeNull()
+    expect(container.querySelector('[stroke-dasharray="4,3"]')).toBeNull()
+  })
+
+  it('shows no tone bar when no fret is selected', () => {
+    const { container } = render(<Fretboard {...defaultProps} />)
+    expect(container.querySelector('path[d^="M"]')).toBeNull()
+  })
+
   it('shows scale degrees when displayMode is scaleDegrees', () => {
     const { container } = render(
       <Fretboard {...defaultProps} displayMode="scaleDegrees" selectedKey="E" />
