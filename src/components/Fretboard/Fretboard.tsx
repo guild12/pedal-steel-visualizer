@@ -117,7 +117,8 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
             leftMargin={LEFT_MARGIN}
           />
           <StringLines
-            totalStrings={copedent.strings.length}
+            strings={copedent.strings}
+            engagedControls={engagedControls}
             fretboardHeight={FRETBOARD_HEIGHT}
             totalWidth={totalSvgWidth}
           />

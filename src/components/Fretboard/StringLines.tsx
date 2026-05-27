@@ -1,23 +1,51 @@
+import type { JSX } from 'react'
+import type { StringConfig } from '../../types'
 import { getStringY, getStringThickness } from '../../utils/fretUtils'
+import { getControlColor } from '../../utils/controlColors'
 
 interface StringLinesProps {
-  totalStrings: number;
+  strings: StringConfig[];
+  engagedControls: Set<string>;
   fretboardHeight: number;
   totalWidth: number;
 }
 
-export function StringLines({ totalStrings, fretboardHeight, totalWidth }: StringLinesProps) {
-  const lines = []
-  for (let i = 0; i < totalStrings; i++) {
-    const y = getStringY(i, totalStrings, fretboardHeight)
-    lines.push(
-      <line
-        key={i}
-        x1={0} y1={y} x2={totalWidth} y2={y}
-        stroke="#9ca3af"
-        strokeWidth={getStringThickness(i, totalStrings)}
-      />
-    )
-  }
+const DASH = 12
+
+export function StringLines({ strings, engagedControls, fretboardHeight, totalWidth }: StringLinesProps) {
+  const lines: JSX.Element[] = []
+
+  strings.forEach((s, i) => {
+    const y = getStringY(i, strings.length, fretboardHeight)
+    const thickness = getStringThickness(i, strings.length)
+    // Dedupe in case a string lists the same control twice (user-created copedent).
+    const affecting = [...new Set(
+      s.changes
+        .map(c => c.control)
+        .filter(control => engagedControls.has(control))
+    )]
+
+    if (affecting.length === 0) {
+      lines.push(
+        <line key={i} x1={0} y1={y} x2={totalWidth} y2={y}
+          stroke="#9ca3af" strokeWidth={thickness} />
+      )
+    } else if (affecting.length === 1) {
+      lines.push(
+        <line key={i} x1={0} y1={y} x2={totalWidth} y2={y}
+          stroke={getControlColor(affecting[0])} strokeWidth={thickness} />
+      )
+    } else {
+      affecting.forEach((control, ci) => {
+        lines.push(
+          <line key={`${i}-${control}`} x1={0} y1={y} x2={totalWidth} y2={y}
+            stroke={getControlColor(control)} strokeWidth={thickness}
+            strokeDasharray={`${DASH},${DASH * (affecting.length - 1)}`}
+            strokeDashoffset={ci * DASH} />
+        )
+      })
+    }
+  })
+
   return <g className="string-lines">{lines}</g>
 }

@@ -1,5 +1,6 @@
 import type { NoteDisplayMode, ColorTheme } from '../../types'
 import { ToggleButton } from './ToggleButton'
+import { getControlColor } from '../../utils/controlColors'
 import { DisplayOptions } from './DisplayOptions'
 import { ColorThemeSelector } from './ColorThemeSelector'
 
@@ -40,6 +41,7 @@ export function ControlPanel({
               key={p}
               label={p}
               engaged={engagedControls.has(p)}
+              color={getControlColor(p)}
               onClick={() => onToggleControl(p)}
             />
           ))}
@@ -56,6 +58,7 @@ export function ControlPanel({
                 key={l}
                 label={l}
                 engaged={engagedControls.has(l)}
+                color={getControlColor(l)}
                 onClick={() => onToggleControl(l)}
               />
             ))}
