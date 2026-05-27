@@ -2,12 +2,14 @@ import { useState, useCallback } from 'react';
 import type {
   ChordFinderState,
   ChordTransitionState,
+  MoveToState,
 } from '../types/chordTypes';
 
 export function useChordState() {
   const [selectedFret, setSelectedFret] = useState<number | null>(null);
   const [chordFinder, setChordFinder] = useState<ChordFinderState | null>(null);
   const [chordTransition, setChordTransition] = useState<ChordTransitionState | null>(null);
+  const [moveTo, setMoveTo] = useState<MoveToState | null>(null);
 
   const selectFret = useCallback((fret: number | null) => {
     setSelectedFret(prev => (prev === fret ? null : fret));
@@ -20,6 +22,7 @@ export function useChordState() {
       results: [],
     });
     setChordTransition(null);
+    setMoveTo(null);
   }, []);
 
   const deactivateChordFinder = useCallback(() => {
@@ -36,6 +39,7 @@ export function useChordState() {
         selectedResultIndex: null,
       });
       setChordFinder(null);
+      setMoveTo(null);
     },
     [],
   );
@@ -50,6 +54,20 @@ export function useChordState() {
     setChordTransition(null);
   }, []);
 
+  const activateMoveTo = useCallback((root: string, quality: string) => {
+    setMoveTo({ active: true, targetChord: { root, quality }, inspectedIndex: null });
+    setChordFinder(null);
+    setChordTransition(null);
+  }, []);
+
+  const inspectMoveResult = useCallback((index: number) => {
+    setMoveTo(prev => (prev ? { ...prev, inspectedIndex: index } : null));
+  }, []);
+
+  const deactivateMoveTo = useCallback(() => {
+    setMoveTo(null);
+  }, []);
+
   return {
     selectedFret,
     chordFinder,
@@ -60,5 +78,9 @@ export function useChordState() {
     activateTransition,
     selectTransitionResult,
     deactivateTransition,
+    moveTo,
+    activateMoveTo,
+    inspectMoveResult,
+    deactivateMoveTo,
   };
 }

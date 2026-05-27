@@ -93,6 +93,12 @@ export interface ChordTransitionState {
   selectedResultIndex: number | null;
 }
 
+export interface MoveToState {
+  active: boolean;
+  targetChord: { root: string; quality: string } | null;
+  inspectedIndex: number | null;
+}
+
 export interface ChordState {
   selectedFret: number | null;
   chordFinder: ChordFinderState | null;

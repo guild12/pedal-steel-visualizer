@@ -64,4 +64,33 @@ describe('useChordState', () => {
     act(() => result.current.deactivateTransition());
     expect(result.current.chordTransition).toBeNull();
   });
+
+  it('initializes move-to as inactive', () => {
+    const { result } = renderHook(() => useChordState());
+    expect(result.current.moveTo).toBeNull();
+  });
+
+  it('activates move-to with a target and clears other modes', () => {
+    const { result } = renderHook(() => useChordState());
+    act(() => result.current.activateChordFinder('C', 'maj'));
+    act(() => result.current.activateMoveTo('A', 'maj'));
+    expect(result.current.moveTo!.active).toBe(true);
+    expect(result.current.moveTo!.targetChord).toEqual({ root: 'A', quality: 'maj' });
+    expect(result.current.moveTo!.inspectedIndex).toBeNull();
+    expect(result.current.chordFinder).toBeNull();
+  });
+
+  it('inspects a move result', () => {
+    const { result } = renderHook(() => useChordState());
+    act(() => result.current.activateMoveTo('A', 'maj'));
+    act(() => result.current.inspectMoveResult(2));
+    expect(result.current.moveTo!.inspectedIndex).toBe(2);
+  });
+
+  it('deactivates move-to', () => {
+    const { result } = renderHook(() => useChordState());
+    act(() => result.current.activateMoveTo('A', 'maj'));
+    act(() => result.current.deactivateMoveTo());
+    expect(result.current.moveTo).toBeNull();
+  });
 });
