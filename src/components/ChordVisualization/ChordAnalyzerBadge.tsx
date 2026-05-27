@@ -14,8 +14,8 @@ interface ChordAnalyzerBadgeProps {
   onChordOverride?: (chord: ChordName | null) => void;
   activeExtensions?: string[];
   showExtensions?: boolean;
-  mutedExtensions?: Set<string>;
-  onToggleExtension?: (note: string) => void;
+  mutedNotes?: Set<string>;
+  onToggleNote?: (note: string) => void;
 }
 
 export function ChordAnalyzerBadge({
@@ -26,8 +26,8 @@ export function ChordAnalyzerBadge({
   onChordOverride,
   activeExtensions,
   showExtensions = true,
-  mutedExtensions,
-  onToggleExtension,
+  mutedNotes,
+  onToggleNote,
 }: ChordAnalyzerBadgeProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -43,7 +43,7 @@ export function ChordAnalyzerBadge({
   // Extensions: use activeExtensions from parent (handles both detected and override).
   // Global toggle hides them entirely; per-extension muting greys individual ones.
   const extensions = showExtensions ? (activeExtensions ?? layers.extensions) : [];
-  const muted = mutedExtensions ?? new Set<string>();
+  const muted = mutedNotes ?? new Set<string>();
 
   // Chord tone degrees (e.g., "1 3 5 7") with function labels for coloring
   const chordDegrees = (() => {
@@ -111,9 +111,9 @@ export function ChordAnalyzerBadge({
               return (
                 <span
                   key={i}
-                  onClick={onToggleExtension ? (ev) => { ev.stopPropagation(); onToggleExtension(note); } : undefined}
-                  title={onToggleExtension ? (isMuted ? 'Click to show this extension' : 'Click to mute this extension') : undefined}
-                  className={`flex flex-col items-center leading-tight ${onToggleExtension ? 'cursor-pointer' : ''}`}
+                  onClick={onToggleNote ? (ev) => { ev.stopPropagation(); onToggleNote(note); } : undefined}
+                  title={onToggleNote ? (isMuted ? 'Click to show this extension' : 'Click to mute this extension') : undefined}
+                  className={`flex flex-col items-center leading-tight ${onToggleNote ? 'cursor-pointer' : ''}`}
                   style={{ color: isMuted ? '#6b7280' : (resolveChordColor(label, colorTheme, true) ?? '#F4A261') }}
                 >
                   <span>{label}</span>
@@ -127,16 +127,21 @@ export function ChordAnalyzerBadge({
 
       {chordDegrees.length > 0 && (
         <div className="flex gap-2.5 mt-1">
-          {chordDegrees.map((d, i) => (
-            <span
-              key={i}
-              className="flex flex-col items-center leading-tight"
-              style={{ color: resolveChordColor(d.fn, colorTheme) ?? '#888' }}
-            >
-              <span className="text-xs font-semibold">{d.degree}</span>
-              <span className="text-[10px] font-mono opacity-90">{d.note}</span>
-            </span>
-          ))}
+          {chordDegrees.map((d, i) => {
+            const isMuted = muted.has(d.note);
+            return (
+              <span
+                key={i}
+                onClick={onToggleNote ? (ev) => { ev.stopPropagation(); onToggleNote(d.note); } : undefined}
+                title={onToggleNote ? (isMuted ? 'Click to show this chord tone' : 'Click to mute this chord tone') : undefined}
+                className={`flex flex-col items-center leading-tight ${onToggleNote ? 'cursor-pointer' : ''}`}
+                style={{ color: isMuted ? '#6b7280' : (resolveChordColor(d.fn, colorTheme) ?? '#888') }}
+              >
+                <span className="text-xs font-semibold">{d.degree}</span>
+                <span className="text-[10px] font-mono opacity-90">{d.note}</span>
+              </span>
+            );
+          })}
         </div>
       )}
 

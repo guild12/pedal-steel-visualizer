@@ -32,21 +32,33 @@ describe('ChordAnalyzerBadge', () => {
     expect(getByText(/OPEN STRINGS/)).toBeTruthy();
   });
 
-  it('clicking an extension calls onToggleExtension with its note', () => {
-    const onToggleExtension = vi.fn();
+  it('clicking an extension calls onToggleNote with its note', () => {
+    const onToggleNote = vi.fn();
     const { getByText } = render(
-      <ChordAnalyzerBadge detection={mockDetection} fret={0} onToggleExtension={onToggleExtension} />
+      <ChordAnalyzerBadge detection={mockDetection} fret={0} onToggleNote={onToggleNote} />
     );
     fireEvent.click(getByText('9'));
-    expect(onToggleExtension).toHaveBeenCalledWith('F#');
+    expect(onToggleNote).toHaveBeenCalledWith('F#');
   });
 
-  it('greys a muted extension instead of coloring it', () => {
+  it('clicking a chord-tone degree calls onToggleNote with its note', () => {
+    const onToggleNote = vi.fn();
     const { getByText } = render(
-      <ChordAnalyzerBadge detection={mockDetection} fret={0} mutedExtensions={new Set(['F#'])} />
+      <ChordAnalyzerBadge detection={mockDetection} fret={0} onToggleNote={onToggleNote} />
     );
-    const labelSpan = getByText('9').closest('span[style]') as HTMLElement;
-    expect(labelSpan.getAttribute('style')).toContain('rgb(107, 114, 128)'); // #6b7280
+    // Emaj degrees: 1 (E), 3 (G#), 5 (B). Click the "3".
+    fireEvent.click(getByText('3'));
+    expect(onToggleNote).toHaveBeenCalledWith('G#');
+  });
+
+  it('greys a muted note (chord tone or extension) instead of coloring it', () => {
+    const { getByText } = render(
+      <ChordAnalyzerBadge detection={mockDetection} fret={0} mutedNotes={new Set(['F#', 'G#'])} />
+    );
+    const extSpan = getByText('9').closest('span[style]') as HTMLElement;
+    expect(extSpan.getAttribute('style')).toContain('rgb(107, 114, 128)'); // #6b7280
+    const degreeSpan = getByText('3').closest('span[style]') as HTMLElement;
+    expect(degreeSpan.getAttribute('style')).toContain('rgb(107, 114, 128)');
   });
 
   it('hides extensions entirely when showExtensions is false', () => {
