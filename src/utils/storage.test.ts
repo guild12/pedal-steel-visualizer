@@ -15,15 +15,42 @@ describe('loadCopedents', () => {
     expect(result[1].name).toBe('Emmons C6')
     expect(result[2].name).toBe('E9/B6 Universal')
   })
-  it('returns saved copedents when storage has data', () => {
+  it('returns saved copedents and re-adds any missing built-in presets', () => {
     const custom: Copedent = {
       id: 'custom-1', name: 'My Custom', pedals: ['A'], kneeLevers: [],
       strings: [{ number: 1, openNote: 'E4', changes: [] }],
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify([custom]))
     const result = loadCopedents()
-    expect(result).toHaveLength(1)
-    expect(result[0].name).toBe('My Custom')
+    const names = result.map(c => c.name)
+    expect(names).toContain('My Custom')
+    expect(names).toContain('Emmons E9')
+    expect(names).toContain('Emmons C6')
+    expect(result).toHaveLength(4) // 3 built-ins restored + custom
+  })
+
+  it('restores a deleted built-in preset on the next load', () => {
+    // User accidentally deleted E9, leaving only C6 saved.
+    const c6Only: Copedent = {
+      id: 'preset-c6', name: 'Emmons C6', pedals: [], kneeLevers: [],
+      strings: [{ number: 1, openNote: 'C4', changes: [] }],
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([c6Only]))
+    const names = loadCopedents().map(c => c.name)
+    expect(names).toContain('Emmons E9') // restored
+    expect(names).toContain('Emmons C6') // preserved
+  })
+
+  it('does not duplicate built-ins that are already present', () => {
+    const custom: Copedent = {
+      id: 'custom-1', name: 'My Custom', pedals: ['A'], kneeLevers: [],
+      strings: [{ number: 1, openNote: 'E4', changes: [] }],
+    }
+    // Save all 3 presets + a custom one.
+    const all = [...loadCopedents(), custom]
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(all))
+    const result = loadCopedents()
+    expect(result).toHaveLength(4) // no duplicate presets
   })
   it('returns presets when storage has invalid JSON', () => {
     localStorage.setItem(STORAGE_KEY, 'not json')
