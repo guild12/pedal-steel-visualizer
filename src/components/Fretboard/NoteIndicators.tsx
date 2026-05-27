@@ -51,9 +51,10 @@ export function NoteIndicators({
         fillColor = resolvedColor;
         strokeColor = resolvedColor;
       } else {
-        // Non-chord note, or no chord active
-        fillColor = isHighlighted ? '#e63946' : '#1f2937';
-        strokeColor = isHighlighted ? '#e63946' : '#4b5563';
+        // Non-chord note (or no chord active). Pedal/lever engagement is shown
+        // on the string lines now, so dots stay neutral regardless of isHighlighted.
+        fillColor = '#1f2937'
+        strokeColor = '#4b5563'
       }
 
       indicators.push(
