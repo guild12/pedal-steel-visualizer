@@ -46,11 +46,6 @@ function App() {
     });
   };
 
-  // Snapshots: independent parallel configurations of the visualizer.
-  const snapshotStore = useSnapshots(() =>
-    makeDefaultSnapshot(crypto.randomUUID(), state.activeCopedentId),
-  )
-
   const liveValues = {
     activeCopedentId: state.activeCopedentId,
     engagedControls: state.engagedControls,
@@ -60,6 +55,16 @@ function App() {
     colorTheme: state.colorTheme,
     showExtensions: state.showExtensions,
   }
+
+  // Snapshots: independent parallel configurations of the visualizer.
+  // Seed snapshot #1 from the user's actual live values (which already reflect
+  // any persisted prefs like colorTheme/showExtensions) so the on-mount hydrate
+  // is a harmless no-op instead of clobbering those prefs with hardcoded defaults.
+  // `liveValues` is a lazy-read inside useState's initializer, so declaring it
+  // just above is sufficient.
+  const snapshotStore = useSnapshots(() =>
+    serializeLive(crypto.randomUUID(), liveValues),
+  )
 
   const setters = {
     setActiveCopedentId: state.setActiveCopedentId,
