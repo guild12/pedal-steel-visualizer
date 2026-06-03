@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Fretboard } from './components/Fretboard/Fretboard'
 import { ControlPanel } from './components/ControlPanel/ControlPanel'
 import { CopedentManager } from './components/CopedentManager/CopedentManager'
@@ -15,8 +15,14 @@ import { ChordPicker } from './components/ChordVisualization/ChordPicker'
 import { TransitionPicker } from './components/ChordVisualization/TransitionPicker'
 import { TransitionResults } from './components/ChordVisualization/TransitionResults'
 import { MoveToPanel } from './components/ChordVisualization/MoveToPanel'
+import { useSnapshots } from './hooks/useSnapshots'
+import { useHorizontalSwipe } from './hooks/useHorizontalSwipe'
+import { SnapshotPager } from './components/SnapshotPager/SnapshotPager'
+import { serializeLive, applySnapshot, makeDefaultSnapshot } from './utils/snapshotSync'
+import { insertAfter, removeAt } from './utils/snapshotOps'
 import type { Copedent } from './types'
 import type { ChordName, ScoredMove, VoicingResult } from './types/chordTypes'
+import type { SnapshotState } from './types/snapshot'
 
 function App() {
   const state = useCopedentState()
@@ -39,6 +45,113 @@ function App() {
       return next;
     });
   };
+
+  // Snapshots: independent parallel configurations of the visualizer.
+  const snapshotStore = useSnapshots(() =>
+    makeDefaultSnapshot(crypto.randomUUID(), state.activeCopedentId),
+  )
+
+  const liveValues = {
+    activeCopedentId: state.activeCopedentId,
+    engagedControls: state.engagedControls,
+    selectedFret: chordState.selectedFret,
+    displayMode: state.displayMode,
+    selectedKey: state.selectedKey,
+    colorTheme: state.colorTheme,
+    showExtensions: state.showExtensions,
+  }
+
+  const setters = {
+    setActiveCopedentId: state.setActiveCopedentId,
+    setControls: state.setControls,
+    setSelectedFret: chordState.setSelectedFret,
+    setDisplayMode: state.setDisplayMode,
+    setSelectedKey: state.setSelectedKey,
+    setColorTheme: state.setColorTheme,
+    setShowExtensions: state.setShowExtensions,
+  }
+
+  const resetTransientPanels = () => {
+    chordState.deactivateChordFinder()
+    chordState.deactivateTransition()
+    chordState.deactivateMoveTo()
+  }
+
+  // On first mount, restore the persisted active snapshot into the live hooks.
+  const didHydrate = useRef(false)
+  useEffect(() => {
+    if (didHydrate.current) return
+    didHydrate.current = true
+    applySnapshot(snapshotStore.snapshots[snapshotStore.activeIndex], setters)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Flush current live state into the active slot, returning the updated array.
+  const flushCurrent = (): SnapshotState[] => {
+    const current = serializeLive(
+      snapshotStore.snapshots[snapshotStore.activeIndex].id,
+      liveValues,
+    )
+    const next = snapshotStore.snapshots.slice()
+    next[snapshotStore.activeIndex] = current
+    return next
+  }
+
+  const goToSnapshot = (index: number) => {
+    if (index < 0 || index >= snapshotStore.snapshots.length) return
+    if (index === snapshotStore.activeIndex) return
+    const flushed = flushCurrent()
+    snapshotStore.setAll({ snapshots: flushed, activeIndex: index })
+    resetTransientPanels()
+    applySnapshot(flushed[index], setters)
+  }
+
+  const addClone = () => {
+    const flushed = flushCurrent()
+    const clone: SnapshotState = {
+      ...flushed[snapshotStore.activeIndex],
+      id: crypto.randomUUID(),
+    }
+    const model = insertAfter(flushed, snapshotStore.activeIndex, clone)
+    snapshotStore.setAll(model)
+    resetTransientPanels()
+    applySnapshot(model.snapshots[model.activeIndex], setters)
+  }
+
+  const addBlank = () => {
+    const flushed = flushCurrent()
+    const blank = makeDefaultSnapshot(crypto.randomUUID(), state.activeCopedentId)
+    const model = insertAfter(flushed, snapshotStore.activeIndex, blank)
+    snapshotStore.setAll(model)
+    resetTransientPanels()
+    applySnapshot(model.snapshots[model.activeIndex], setters)
+  }
+  // addBlank is intended for a future "new blank snapshot" affordance; the `+`
+  // button currently clones. Reference it so strict tsc/eslint don't flag it.
+  void addBlank
+
+  const nextSnapshot = () => {
+    // Swiping past the last snapshot clones the current one (Safari-style).
+    if (snapshotStore.activeIndex >= snapshotStore.snapshots.length - 1) {
+      addClone()
+    } else {
+      goToSnapshot(snapshotStore.activeIndex + 1)
+    }
+  }
+
+  const prevSnapshot = () => goToSnapshot(snapshotStore.activeIndex - 1)
+
+  const deleteCurrent = () => {
+    const model = removeAt(snapshotStore.snapshots, snapshotStore.activeIndex, () =>
+      makeDefaultSnapshot(crypto.randomUUID(), state.activeCopedentId),
+    )
+    snapshotStore.setAll(model)
+    resetTransientPanels()
+    applySnapshot(model.snapshots[model.activeIndex], setters)
+  }
+
+  const mainRef = useRef<HTMLElement>(null)
+  useHorizontalSwipe(mainRef, { onSwipeLeft: nextSnapshot, onSwipeRight: prevSnapshot })
 
   // Compute chord detection for current fret + controls
   const currentDetection = useMemo(() => {
@@ -229,7 +342,17 @@ function App() {
         </div>
       </header>
 
-      <main className="p-6 space-y-6 max-w-3xl">
+      <main ref={mainRef} className="p-6 space-y-6 max-w-3xl [overscroll-behavior-x:contain]">
+        <SnapshotPager
+          count={snapshotStore.snapshots.length}
+          activeIndex={snapshotStore.activeIndex}
+          onGo={goToSnapshot}
+          onPrev={prevSnapshot}
+          onNext={nextSnapshot}
+          onAdd={addClone}
+          onDeleteCurrent={deleteCurrent}
+        />
+
         {/* Chord Picker (above fretboard) */}
         {chordState.chordFinder?.active && (
           <ChordPicker
