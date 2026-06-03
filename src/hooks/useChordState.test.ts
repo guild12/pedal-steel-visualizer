@@ -94,3 +94,15 @@ describe('useChordState', () => {
     expect(result.current.moveTo).toBeNull();
   });
 });
+
+describe('setSelectedFret', () => {
+  it('sets the fret without toggling on repeat', () => {
+    const { result } = renderHook(() => useChordState());
+    act(() => result.current.setSelectedFret(4));
+    expect(result.current.selectedFret).toBe(4);
+    act(() => result.current.setSelectedFret(4));
+    expect(result.current.selectedFret).toBe(4); // does NOT toggle to null
+    act(() => result.current.setSelectedFret(null));
+    expect(result.current.selectedFret).toBeNull();
+  });
+});

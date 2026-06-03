@@ -6,13 +6,17 @@ import type {
 } from '../types/chordTypes';
 
 export function useChordState() {
-  const [selectedFret, setSelectedFret] = useState<number | null>(null);
+  const [selectedFret, setSelectedFret_] = useState<number | null>(null);
   const [chordFinder, setChordFinder] = useState<ChordFinderState | null>(null);
   const [chordTransition, setChordTransition] = useState<ChordTransitionState | null>(null);
   const [moveTo, setMoveTo] = useState<MoveToState | null>(null);
 
   const selectFret = useCallback((fret: number | null) => {
-    setSelectedFret(prev => (prev === fret ? null : fret));
+    setSelectedFret_(prev => (prev === fret ? null : fret));
+  }, []);
+
+  const setSelectedFret = useCallback((fret: number | null) => {
+    setSelectedFret_(fret);
   }, []);
 
   const activateChordFinder = useCallback((root: string, quality: string) => {
@@ -73,6 +77,7 @@ export function useChordState() {
     chordFinder,
     chordTransition,
     selectFret,
+    setSelectedFret,
     activateChordFinder,
     deactivateChordFinder,
     activateTransition,

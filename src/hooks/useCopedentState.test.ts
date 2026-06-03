@@ -113,3 +113,15 @@ describe('useCopedentState', () => {
     expect(result.current.activeCopedent.name).toBe('Custom')
   })
 })
+
+describe('setShowExtensions', () => {
+  it('sets the value directly regardless of current state', () => {
+    const { result } = renderHook(() => useCopedentState())
+    act(() => result.current.setShowExtensions(false))
+    expect(result.current.showExtensions).toBe(false)
+    act(() => result.current.setShowExtensions(false))
+    expect(result.current.showExtensions).toBe(false)
+    act(() => result.current.setShowExtensions(true))
+    expect(result.current.showExtensions).toBe(true)
+  })
+})

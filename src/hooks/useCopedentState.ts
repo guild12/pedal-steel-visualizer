@@ -59,6 +59,10 @@ export function useCopedentState() {
     setShowExtensions(v => !v)
   }, [])
 
+  const setShowExtensionsValue = useCallback((value: boolean) => {
+    setShowExtensions(value)
+  }, [])
+
   const updateCopedent = useCallback((id: string, updates: Partial<Copedent>) => {
     setCopedents(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c))
   }, [])
@@ -108,6 +112,7 @@ export function useCopedentState() {
     clearAllControls,
     setControls,
     toggleShowExtensions,
+    setShowExtensions: setShowExtensionsValue,
     setDisplayMode,
     setSelectedKey,
     setColorTheme,
