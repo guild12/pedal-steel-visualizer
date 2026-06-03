@@ -53,4 +53,30 @@ describe('useHorizontalSwipe', () => {
     target.fire('wheel', { deltaX: -90, deltaY: 0, ctrlKey: false })
     expect(onSwipeRight).toHaveBeenCalledTimes(1)
   })
+
+  it('still fires later swipes after a re-render with new callbacks (idle reset survives re-render)', () => {
+    const target = makeTarget()
+    const ref = { current: target.el }
+    const onSwipeLeft = vi.fn()
+    const onSwipeRight = vi.fn()
+    const { rerender } = renderHook(
+      (props: { onSwipeLeft: () => void; onSwipeRight: () => void }) =>
+        useHorizontalSwipe(ref, { ...props, threshold: 80, idleResetMs: 300 }),
+      { initialProps: { onSwipeLeft, onSwipeRight } },
+    )
+
+    target.fire('wheel', { deltaX: 100, deltaY: 0, ctrlKey: false })
+    expect(onSwipeLeft).toHaveBeenCalledTimes(1)
+
+    // App re-renders with brand-new callback identities every render:
+    const onSwipeLeft2 = vi.fn()
+    const onSwipeRight2 = vi.fn()
+    rerender({ onSwipeLeft: onSwipeLeft2, onSwipeRight: onSwipeRight2 })
+
+    // idle reset should elapse and clear the accumulator / fired flag
+    vi.advanceTimersByTime(400)
+
+    target.fire('wheel', { deltaX: -100, deltaY: 0, ctrlKey: false })
+    expect(onSwipeRight2).toHaveBeenCalledTimes(1)
+  })
 })

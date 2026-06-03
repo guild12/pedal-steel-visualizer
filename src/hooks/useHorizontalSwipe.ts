@@ -16,6 +16,11 @@ export function useHorizontalSwipe(
   const fired = useRef(false)
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Latest-callback ref: updated every render so the once-subscribed listener
+  // always calls the current handlers without needing to re-subscribe.
+  const callbacks = useRef({ onSwipeLeft, onSwipeRight })
+  callbacks.current = { onSwipeLeft, onSwipeRight }
+
   useEffect(() => {
     const el = ref.current
     if (!el) return
@@ -35,8 +40,8 @@ export function useHorizontalSwipe(
 
       if (!fired.current && Math.abs(accum.current) >= threshold) {
         fired.current = true
-        if (accum.current > 0) onSwipeLeft()
-        else onSwipeRight()
+        if (accum.current > 0) callbacks.current.onSwipeLeft()
+        else callbacks.current.onSwipeRight()
       }
     }
 
@@ -45,5 +50,5 @@ export function useHorizontalSwipe(
       el.removeEventListener('wheel', onWheel)
       if (resetTimer.current) clearTimeout(resetTimer.current)
     }
-  }, [ref, onSwipeLeft, onSwipeRight, threshold, idleResetMs])
+  }, [ref, threshold, idleResetMs])
 }
