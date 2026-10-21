@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render } from '@testing-library/react'
 import { Fretboard } from './Fretboard'
 import { E9_PRESET } from '../../data/presets'
@@ -75,5 +75,55 @@ describe('Fretboard', () => {
     const texts = Array.from(noteGroup?.querySelectorAll('text') ?? []).map(el => el.textContent)
     expect(texts.filter(t => t === '1').length).toBeGreaterThan(0)
     expect(texts.filter(t => t === '5').length).toBeGreaterThan(0)
+  })
+
+  it('wrapper scrolls horizontally instead of shrinking the board', () => {
+    const { container } = render(<Fretboard {...defaultProps} />)
+    const wrapper = container.firstElementChild as HTMLElement
+    expect(wrapper.className).toContain('overflow-x-auto')
+    expect(wrapper.className).toContain('w-full')
+  })
+
+  it('gives the SVG a pixel width equal to the viewBox width', () => {
+    const { container } = render(<Fretboard {...defaultProps} />)
+    const svg = container.querySelector('svg')!
+    const viewBoxWidth = svg.getAttribute('viewBox')!.split(' ')[2]
+    expect(svg.getAttribute('width')).not.toBe('100%')
+    expect(svg.getAttribute('width')).toBe(viewBoxWidth)
+  })
+
+  it('grows taller with more strings', () => {
+    const strings14 = Array.from({ length: 14 }, (_, i) => ({
+      ...E9_PRESET.strings[i % E9_PRESET.strings.length],
+      number: i + 1,
+    }))
+    const small = render(<Fretboard {...defaultProps} />)
+    const h10 = Number(small.container.querySelector('svg')!.getAttribute('height'))
+    small.unmount()
+    const big = render(<Fretboard {...defaultProps} copedent={{ ...E9_PRESET, strings: strings14 }} />)
+    const h14 = Number(big.container.querySelector('svg')!.getAttribute('height'))
+    expect(h14).toBeGreaterThan(h10)
+  })
+
+  describe('narrow container', () => {
+    afterEach(() => vi.unstubAllGlobals())
+
+    it('keeps a readable minimum width (scrolls) instead of shrinking', () => {
+      class NarrowResizeObserver {
+        cb: ResizeObserverCallback
+        constructor(cb: ResizeObserverCallback) { this.cb = cb }
+        observe() {
+          this.cb([{ contentRect: { width: 300 } } as ResizeObserverEntry], this as unknown as ResizeObserver)
+        }
+        unobserve() {}
+        disconnect() {}
+      }
+      vi.stubGlobal('ResizeObserver', NarrowResizeObserver)
+      const { container } = render(<Fretboard {...defaultProps} />)
+      const svg = container.querySelector('svg')!
+      const width = Number(svg.getAttribute('width'))
+      expect(width).toBeGreaterThanOrEqual(13 * 40 + 50 + 10)
+      expect(svg.getAttribute('viewBox')!.split(' ')[2]).toBe(String(width))
+    })
   })
 })

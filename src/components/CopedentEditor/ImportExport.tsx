@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Copedent } from '../../types'
+import { parseCopedentJson } from '../../utils/copedentImport'
 
 interface ImportExportProps {
   copedent: Copedent;
@@ -22,19 +23,16 @@ export function ImportExport({ copedent, onUpdate }: ImportExportProps) {
   }
 
   const handleImport = () => {
-    try {
-      const parsed = JSON.parse(importText)
-      if (parsed.name && parsed.strings && Array.isArray(parsed.strings)) {
-        const { id, ...updates } = parsed
-        onUpdate(updates)
-        setImportText('')
-        setImportError('')
-      } else {
-        setImportError('Invalid copedent format')
-      }
-    } catch {
-      setImportError('Invalid JSON')
+    // Pasting replaces this copedent's contents but keeps its identity.
+    const result = parseCopedentJson(importText, copedent.id)
+    if (!result.ok) {
+      setImportError(result.error)
+      return
     }
+    const { name, pedals, kneeLevers, strings } = result.copedent
+    onUpdate({ name, pedals, kneeLevers, strings })
+    setImportText('')
+    setImportError('')
   }
 
   return (

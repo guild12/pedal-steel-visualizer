@@ -17,13 +17,13 @@ An interactive pedal steel guitar visualizer built for learning and exploring th
 - `npm run dev` — start dev server
 - `npm run build` — typecheck + production build
 - `npm test` — run tests (vitest)
-- `npm run lint` — run eslint
+- `npm run lint` — run eslint (CI runs lint, test, and build on every push to main; Pages deploy runs from main)
 
 ## Project Structure
 
 ```
 src/
-  components/     — React components (ChordVisualization, ControlPanel, CopedentEditor, CopedentManager, Fretboard)
+  components/     — React components (ChordVisualization, ControlPanel, CopedentEditor, CopedentManager, Fretboard, SnapshotPager, HintStrip, ErrorBoundary)
   data/           — copedent presets and instrument data
   hooks/          — custom React hooks
   types/          — TypeScript type definitions

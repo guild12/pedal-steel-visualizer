@@ -46,7 +46,7 @@ export function ChordPicker({
   };
 
   return (
-    <div className="inline-flex items-start gap-3 bg-gray-900 border border-gray-700 rounded-xl p-3">
+    <div className="relative flex flex-wrap items-start gap-3 bg-gray-900 border border-gray-700 rounded-xl p-3 pr-8 sm:inline-flex sm:pr-3">
       <div>
         <div className="text-gray-500 text-[9px] uppercase mb-1.5">Root</div>
         <div className="grid grid-cols-6 gap-1">
@@ -66,7 +66,7 @@ export function ChordPicker({
         </div>
       </div>
 
-      <div className="w-px h-16 bg-gray-700 self-center" />
+      <div className="hidden sm:block w-px h-16 bg-gray-700 self-center" />
 
       <div>
         <div className="text-gray-500 text-[9px] uppercase mb-1.5">Quality</div>
@@ -87,7 +87,7 @@ export function ChordPicker({
         </div>
       </div>
 
-      <div className="w-px h-16 bg-gray-700 self-center" />
+      <div className="hidden sm:block w-px h-16 bg-gray-700 self-center" />
 
       <div>
         <div className="text-gray-500 text-[9px] uppercase mb-1.5">Or type</div>
@@ -105,7 +105,7 @@ export function ChordPicker({
       <button
         onClick={onClose}
         aria-label="Close"
-        className="text-gray-500 hover:text-gray-300 text-lg self-start"
+        className="absolute top-2 right-3 sm:static text-gray-500 hover:text-gray-300 text-lg self-start"
       >
         ×
       </button>

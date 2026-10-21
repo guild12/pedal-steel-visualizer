@@ -81,16 +81,15 @@ export function useCopedentState() {
   }, [])
 
   const deleteCopedent = useCallback((id: string) => {
-    setCopedents(prev => {
-      if (prev.length <= 1) return prev
-      const next = prev.filter(c => c.id !== id)
-      if (activeCopedentId === id) {
-        setActiveCopedentId(next[0].id)
-        setEngagedControls(new Set())
-      }
-      return next
-    })
-  }, [activeCopedentId])
+    if (copedents.length <= 1) return
+    const next = copedents.filter(c => c.id !== id)
+    if (next.length === copedents.length) return
+    setCopedents(next)
+    if (activeCopedentId === id) {
+      setActiveCopedentId(next[0].id)
+      setEngagedControls(new Set())
+    }
+  }, [copedents, activeCopedentId])
 
   const createCopedent = useCallback((copedent: Copedent) => {
     setCopedents(prev => [...prev, copedent])

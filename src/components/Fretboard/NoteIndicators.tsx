@@ -22,8 +22,16 @@ export function NoteIndicators({
   colorTheme = 'chordTones',
 }: NoteIndicatorsProps) {
   const indicators: React.JSX.Element[] = []
-  const radius = 11
-  const fontSize = 9
+  const fretSpacing = fretboardWidth / TOTAL_FRETS
+  const stringSpacing = strings.length > 1
+    ? getStringY(1, strings.length, fretboardHeight) - getStringY(0, strings.length, fretboardHeight)
+    : Infinity
+  // Scale dots with available space, but never let neighbouring strings overlap.
+  const radius = Math.min(
+    Math.min(Math.max(fretSpacing * 0.2, 9), 15),
+    (stringSpacing - 6) / 2,
+  )
+  const fontSize = Math.round(radius * 0.82)
 
   strings.forEach((s, si) => {
     const y = getStringY(si, strings.length, fretboardHeight)
@@ -45,7 +53,7 @@ export function NoteIndicators({
       const resolvedColor = resolveChordColor(chordFunction, colorTheme, chordInfo?.isExtension);
       let fillColor: string;
       let strokeColor: string;
-      let textColor = '#fff';
+      const textColor = '#fff';
 
       if (resolvedColor) {
         fillColor = resolvedColor;

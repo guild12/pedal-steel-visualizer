@@ -27,11 +27,14 @@ describe('findVoicings', () => {
     }
   });
 
-  it('only searches frets 0-11', () => {
+  it('searches frets 0-12 inclusive', () => {
     const results = findVoicings('C', 'maj', E9_PRESET);
     for (const v of results) {
-      expect(v.fret).toBeLessThan(12);
+      expect(v.fret).toBeLessThanOrEqual(12);
     }
+    // Open E repeats an octave up at fret 12, so the search must offer it there.
+    const eAt12 = findVoicings('E', 'maj', E9_PRESET).find(v => v.fret === 12 && v.engagedControls.length === 0);
+    expect(eAt12).toBeDefined();
   });
 
   it('each voicing note includes chord function', () => {
