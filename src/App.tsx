@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { Fretboard } from './components/Fretboard/Fretboard'
 import { ControlPanel } from './components/ControlPanel/ControlPanel'
 import { CopedentManager } from './components/CopedentManager/CopedentManager'
@@ -15,14 +15,12 @@ import { ChordPicker } from './components/ChordVisualization/ChordPicker'
 import { TransitionPicker } from './components/ChordVisualization/TransitionPicker'
 import { TransitionResults } from './components/ChordVisualization/TransitionResults'
 import { MoveToPanel } from './components/ChordVisualization/MoveToPanel'
-import { useSnapshots } from './hooks/useSnapshots'
+import { useSnapshotNavigation } from './hooks/useSnapshotNavigation'
 import { useHorizontalSwipe } from './hooks/useHorizontalSwipe'
 import { SnapshotPager } from './components/SnapshotPager/SnapshotPager'
-import { serializeLive, applySnapshot, makeDefaultSnapshot } from './utils/snapshotSync'
-import { insertAfter, removeAt } from './utils/snapshotOps'
+import { HintStrip } from './components/HintStrip/HintStrip'
 import type { Copedent } from './types'
 import type { ChordName, ScoredMove, VoicingResult } from './types/chordTypes'
-import type { SnapshotState } from './types/snapshot'
 
 function App() {
   const state = useCopedentState()
@@ -46,117 +44,38 @@ function App() {
     });
   };
 
-  const liveValues = {
-    activeCopedentId: state.activeCopedentId,
-    engagedControls: state.engagedControls,
-    selectedFret: chordState.selectedFret,
-    displayMode: state.displayMode,
-    selectedKey: state.selectedKey,
-    colorTheme: state.colorTheme,
-    showExtensions: state.showExtensions,
-  }
+  const { deactivateChordFinder, deactivateTransition, deactivateMoveTo } = chordState
+  const resetTransientPanels = useCallback(() => {
+    deactivateChordFinder()
+    deactivateTransition()
+    deactivateMoveTo()
+  }, [deactivateChordFinder, deactivateTransition, deactivateMoveTo])
 
   // Snapshots: independent parallel configurations of the visualizer.
-  // Seed snapshot #1 from the user's actual live values (which already reflect
-  // any persisted prefs like colorTheme/showExtensions) so the on-mount hydrate
-  // is a harmless no-op instead of clobbering those prefs with hardcoded defaults.
-  // `liveValues` is a lazy-read inside useState's initializer, so declaring it
-  // just above is sufficient.
-  const snapshotStore = useSnapshots(() =>
-    serializeLive(crypto.randomUUID(), liveValues),
-  )
-
-  const setters = {
-    setActiveCopedentId: state.setActiveCopedentId,
-    setControls: state.setControls,
-    setSelectedFret: chordState.setSelectedFret,
-    setDisplayMode: state.setDisplayMode,
-    setSelectedKey: state.setSelectedKey,
-    setColorTheme: state.setColorTheme,
-    setShowExtensions: state.setShowExtensions,
-  }
-
-  const resetTransientPanels = () => {
-    chordState.deactivateChordFinder()
-    chordState.deactivateTransition()
-    chordState.deactivateMoveTo()
-  }
-
-  // On first mount, restore the persisted active snapshot into the live hooks.
-  const didHydrate = useRef(false)
-  useEffect(() => {
-    if (didHydrate.current) return
-    didHydrate.current = true
-    applySnapshot(snapshotStore.snapshots[snapshotStore.activeIndex], setters)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // Flush current live state into the active slot, returning the updated array.
-  const flushCurrent = (): SnapshotState[] => {
-    const current = serializeLive(
-      snapshotStore.snapshots[snapshotStore.activeIndex].id,
-      liveValues,
-    )
-    const next = snapshotStore.snapshots.slice()
-    next[snapshotStore.activeIndex] = current
-    return next
-  }
-
-  const goToSnapshot = (index: number) => {
-    if (index < 0 || index >= snapshotStore.snapshots.length) return
-    if (index === snapshotStore.activeIndex) return
-    const flushed = flushCurrent()
-    snapshotStore.setAll({ snapshots: flushed, activeIndex: index })
-    resetTransientPanels()
-    applySnapshot(flushed[index], setters)
-  }
-
-  const addClone = () => {
-    const flushed = flushCurrent()
-    const clone: SnapshotState = {
-      ...flushed[snapshotStore.activeIndex],
-      id: crypto.randomUUID(),
-    }
-    const model = insertAfter(flushed, snapshotStore.activeIndex, clone)
-    snapshotStore.setAll(model)
-    resetTransientPanels()
-    applySnapshot(model.snapshots[model.activeIndex], setters)
-  }
-
-  const addBlank = () => {
-    const flushed = flushCurrent()
-    const blank = makeDefaultSnapshot(crypto.randomUUID(), state.activeCopedentId)
-    const model = insertAfter(flushed, snapshotStore.activeIndex, blank)
-    snapshotStore.setAll(model)
-    resetTransientPanels()
-    applySnapshot(model.snapshots[model.activeIndex], setters)
-  }
-  // addBlank is intended for a future "new blank snapshot" affordance; the `+`
-  // button currently clones. Reference it so strict tsc/eslint don't flag it.
-  void addBlank
-
-  const nextSnapshot = () => {
-    // Swiping past the last snapshot clones the current one (Safari-style).
-    if (snapshotStore.activeIndex >= snapshotStore.snapshots.length - 1) {
-      addClone()
-    } else {
-      goToSnapshot(snapshotStore.activeIndex + 1)
-    }
-  }
-
-  const prevSnapshot = () => goToSnapshot(snapshotStore.activeIndex - 1)
-
-  const deleteCurrent = () => {
-    const model = removeAt(snapshotStore.snapshots, snapshotStore.activeIndex, () =>
-      makeDefaultSnapshot(crypto.randomUUID(), state.activeCopedentId),
-    )
-    snapshotStore.setAll(model)
-    resetTransientPanels()
-    applySnapshot(model.snapshots[model.activeIndex], setters)
-  }
+  const snapshotNav = useSnapshotNavigation({
+    live: {
+      activeCopedentId: state.activeCopedentId,
+      engagedControls: state.engagedControls,
+      selectedFret: chordState.selectedFret,
+      displayMode: state.displayMode,
+      selectedKey: state.selectedKey,
+      colorTheme: state.colorTheme,
+      showExtensions: state.showExtensions,
+    },
+    setters: {
+      setActiveCopedentId: state.setActiveCopedentId,
+      setControls: state.setControls,
+      setSelectedFret: chordState.setSelectedFret,
+      setDisplayMode: state.setDisplayMode,
+      setSelectedKey: state.setSelectedKey,
+      setColorTheme: state.setColorTheme,
+      setShowExtensions: state.setShowExtensions,
+    },
+    onBeforeSwitch: resetTransientPanels,
+  })
 
   const mainRef = useRef<HTMLElement>(null)
-  useHorizontalSwipe(mainRef, { onSwipeLeft: nextSnapshot, onSwipeRight: prevSnapshot })
+  useHorizontalSwipe(mainRef, { onSwipeLeft: snapshotNav.next, onSwipeRight: snapshotNav.prev })
 
   // Compute chord detection for current fret + controls
   const currentDetection = useMemo(() => {
@@ -167,11 +86,14 @@ function App() {
     return detectChord(notes);
   }, [chordState.selectedFret, state.engagedControls, state.activeCopedent]);
 
-  // Auto-reset override + muted extensions when detection changes (fret change, pedal toggle, etc.)
-  useEffect(() => {
+  // Auto-reset override + muted notes when detection changes (fret change,
+  // pedal toggle, etc.). Done during render so there is no stale frame.
+  const [detectionForOverride, setDetectionForOverride] = useState(currentDetection);
+  if (detectionForOverride !== currentDetection) {
+    setDetectionForOverride(currentDetection);
     setOverrideChord(null);
     setMutedNotes(new Set());
-  }, [currentDetection]);
+  }
 
   // Active chord: override wins over auto-detected
   const activeChord = overrideChord ?? currentDetection?.primary ?? null;
@@ -188,7 +110,10 @@ function App() {
   }, [overrideChord, chordState.selectedFret, state.activeCopedent, state.engagedControls]);
 
   // Active extensions: override-computed or detected
-  const activeExtensions = overrideChord ? overrideExtensions : (currentDetection?.layers.extensions ?? []);
+  const activeExtensions = useMemo(
+    () => (overrideChord ? overrideExtensions : (currentDetection?.layers.extensions ?? [])),
+    [overrideChord, overrideExtensions, currentDetection],
+  );
 
   // Compute chord notes map for coloring (pitch class → { fn, isExtension })
   const chordNotesMap = useMemo(() => {
@@ -224,23 +149,25 @@ function App() {
   }, [activeChord, activeExtensions, chordState.selectedFret, state.showExtensions, mutedNotes]);
 
   // Compute voicing search results for chord finder
+  const finderTarget = chordState.chordFinder?.targetChord ?? null;
   const finderResults = useMemo(() => {
-    if (!chordState.chordFinder?.targetChord) return [];
-    const { root, quality } = chordState.chordFinder.targetChord;
-    return findVoicings(root, quality, state.activeCopedent);
-  }, [chordState.chordFinder?.targetChord, state.activeCopedent]);
+    if (!finderTarget) return [];
+    return findVoicings(finderTarget.root, finderTarget.quality, state.activeCopedent);
+  }, [finderTarget, state.activeCopedent]);
 
   // Compute transition results
+  const { chordTransition } = chordState;
   const transitionResults = useMemo(() => {
-    if (!chordState.chordTransition?.chordA || !chordState.chordTransition?.chordB) return [];
-    const { chordA, chordB } = chordState.chordTransition;
+    if (!chordTransition?.chordA || !chordTransition?.chordB) return [];
+    const { chordA, chordB } = chordTransition;
     return findTransitions(chordA.root, chordA.quality, chordB.root, chordB.quality, state.activeCopedent);
-  }, [chordState.chordTransition?.chordA, chordState.chordTransition?.chordB, state.activeCopedent]);
+  }, [chordTransition, state.activeCopedent]);
 
   // Compute ranked moves from the live position to the target chord
+  const moveTarget = chordState.moveTo?.targetChord ?? null;
   const moveResults = useMemo<ScoredMove[]>(() => {
-    if (!chordState.moveTo?.targetChord) return [];
-    const { root, quality } = chordState.moveTo.targetChord;
+    if (!moveTarget) return [];
+    const { root, quality } = moveTarget;
     const fret = chordState.selectedFret ?? 0;
     const source = {
       fret,
@@ -261,12 +188,7 @@ function App() {
       }
     }
     return [...bestByFret.values()].sort((a, b) => a.effort.totalScore - b.effort.totalScore);
-  }, [
-    chordState.moveTo?.targetChord,
-    chordState.selectedFret,
-    state.engagedControls,
-    state.activeCopedent,
-  ]);
+  }, [moveTarget, chordState.selectedFret, state.engagedControls, state.activeCopedent]);
 
   // Fret currently inspected in Move-To (for overlay highlight)
   const moveInspectedFret =
@@ -298,31 +220,38 @@ function App() {
     setEditorOpen(true)
   }
 
+  // Keyboard: Escape resets the board, digits toggle pedals. Both are ignored
+  // while typing in a text field so the chord picker's input stays usable.
+  const { toggleControl, clearAllControls } = state
+  const { selectFret } = chordState
+  const pedals = state.activeCopedent.pedals
   useEffect(() => {
+    const isTyping = () => {
+      const tag = document.activeElement?.tagName
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
+    }
     const handler = (e: KeyboardEvent) => {
+      if (isTyping()) return
       if (e.key === 'Escape') {
-        state.clearAllControls()
-        chordState.selectFret(null)
-        chordState.deactivateChordFinder()
-        chordState.deactivateTransition()
-        chordState.deactivateMoveTo()
+        clearAllControls()
+        selectFret(null)
+        resetTransientPanels()
         return
       }
       const num = parseInt(e.key, 10)
-      if (!isNaN(num) && num >= 1 && num <= state.activeCopedent.pedals.length) {
-        if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') return
-        state.toggleControl(state.activeCopedent.pedals[num - 1])
+      if (!isNaN(num) && num >= 1 && num <= pedals.length) {
+        toggleControl(pedals[num - 1])
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [state.activeCopedent.pedals, state.toggleControl, state.clearAllControls, chordState])
+  }, [pedals, toggleControl, clearAllControls, selectFret, resetTransientPanels])
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <header className="px-6 py-4 border-b border-gray-800">
-        <div className="flex items-center justify-between max-w-3xl">
-          <h1 className="text-xl font-bold">Pedal Steel Visualizer</h1>
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 max-w-6xl">
+          <h1 className="text-xl font-bold whitespace-nowrap">Pedal Steel Visualizer</h1>
           <CopedentManager
             copedents={state.copedents}
             activeCopedentId={state.activeCopedentId}
@@ -347,16 +276,18 @@ function App() {
         </div>
       </header>
 
-      <main ref={mainRef} className="p-6 space-y-6 max-w-3xl [overscroll-behavior-x:contain]">
+      <main ref={mainRef} className="p-4 sm:p-6 space-y-6 max-w-6xl [overscroll-behavior-x:contain]">
         <SnapshotPager
-          count={snapshotStore.snapshots.length}
-          activeIndex={snapshotStore.activeIndex}
-          onGo={goToSnapshot}
-          onPrev={prevSnapshot}
-          onNext={nextSnapshot}
-          onAdd={addClone}
-          onDeleteCurrent={deleteCurrent}
+          count={snapshotNav.snapshots.length}
+          activeIndex={snapshotNav.activeIndex}
+          onGo={snapshotNav.goTo}
+          onPrev={snapshotNav.prev}
+          onNext={snapshotNav.next}
+          onAdd={snapshotNav.addClone}
+          onDeleteCurrent={snapshotNav.deleteCurrent}
         />
+
+        <HintStrip pedalCount={state.activeCopedent.pedals.length} />
 
         {/* Chord Picker (above fretboard) */}
         {chordState.chordFinder?.active && (
