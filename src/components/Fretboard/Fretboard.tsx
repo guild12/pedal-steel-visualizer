@@ -31,8 +31,9 @@ const LEFT_MARGIN = 50
 const TOP_LABEL_HEIGHT = 20
 const BOTTOM_LABEL_HEIGHT = 20
 const STRING_LABEL_WIDTH = 30
-const FRETBOARD_HEIGHT = 300
-const MIN_FRET_WIDTH = 28
+const MIN_FRETBOARD_HEIGHT = 300
+const HEIGHT_PER_STRING = 32
+const MIN_FRET_WIDTH = 40
 
 export function Fretboard({ copedent, engagedControls, displayMode, selectedKey, selectedFret = null, onFretClick, chordNotes = null, finderResults = null, finderTargetChord = null, moveResults = null, moveInspectedFret = null, onMoveInspectFret, colorTheme = 'chordTones' }: FretboardProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -49,9 +50,28 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
     return () => observer.disconnect()
   }, [])
 
+  // The parent <main> has native wheel/touchmove listeners that page between
+  // snapshots on horizontal gestures. When the board overflows, let the
+  // gesture scroll the board instead. Native listeners on an ancestor are not
+  // stopped by React synthetic stopPropagation, so attach native ones here.
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const stopIfOverflowing = (e: Event) => {
+      if (el.scrollWidth > el.clientWidth) e.stopPropagation()
+    }
+    el.addEventListener('wheel', stopIfOverflowing, { passive: true })
+    el.addEventListener('touchmove', stopIfOverflowing, { passive: true })
+    return () => {
+      el.removeEventListener('wheel', stopIfOverflowing)
+      el.removeEventListener('touchmove', stopIfOverflowing)
+    }
+  }, [])
+
   const fretboardWidth = Math.max(containerWidth - LEFT_MARGIN - STRING_LABEL_WIDTH, (TOTAL_FRETS + 1) * MIN_FRET_WIDTH)
   const totalSvgWidth = LEFT_MARGIN + fretboardWidth + 10
-  const totalSvgHeight = TOP_LABEL_HEIGHT + FRETBOARD_HEIGHT + BOTTOM_LABEL_HEIGHT
+  const fretboardHeight = Math.max(MIN_FRETBOARD_HEIGHT, copedent.strings.length * HEIGHT_PER_STRING)
+  const totalSvgHeight = TOP_LABEL_HEIGHT + fretboardHeight + BOTTOM_LABEL_HEIGHT
 
   // Fret number labels — directly on fret lines (bar positions)
   const fretLabels: React.JSX.Element[] = []
@@ -74,7 +94,7 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
 
   // String number labels
   const paddingY = 20
-  const usableHeight = FRETBOARD_HEIGHT - paddingY * 2
+  const usableHeight = fretboardHeight - paddingY * 2
   const spacing = usableHeight / (copedent.strings.length - 1)
   const stringLabels = copedent.strings.map((s, i) => {
     const sy = TOP_LABEL_HEIGHT + paddingY + i * spacing
@@ -95,9 +115,9 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
   })
 
   return (
-    <div ref={containerRef} className="w-full">
+    <div ref={containerRef} className="w-full overflow-x-auto">
       <svg
-        width="100%"
+        width={totalSvgWidth}
         height={totalSvgHeight}
         viewBox={`0 0 ${totalSvgWidth} ${totalSvgHeight}`}
         preserveAspectRatio="xMinYMid meet"
@@ -112,18 +132,18 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
         <g transform={`translate(0, ${TOP_LABEL_HEIGHT})`}>
           <FretMarkers
             fretboardWidth={fretboardWidth}
-            fretboardHeight={FRETBOARD_HEIGHT}
+            fretboardHeight={fretboardHeight}
             leftMargin={LEFT_MARGIN}
           />
           <FretLines
             fretboardWidth={fretboardWidth}
-            fretboardHeight={FRETBOARD_HEIGHT}
+            fretboardHeight={fretboardHeight}
             leftMargin={LEFT_MARGIN}
           />
           <StringLines
             strings={copedent.strings}
             engagedControls={engagedControls}
-            fretboardHeight={FRETBOARD_HEIGHT}
+            fretboardHeight={fretboardHeight}
             totalWidth={totalSvgWidth}
           />
           <NoteIndicators
@@ -132,7 +152,7 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
             displayMode={displayMode}
             selectedKey={selectedKey}
             fretboardWidth={fretboardWidth}
-            fretboardHeight={FRETBOARD_HEIGHT}
+            fretboardHeight={fretboardHeight}
             leftMargin={LEFT_MARGIN}
             chordNotes={chordNotes}
             colorTheme={colorTheme}
@@ -148,7 +168,7 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
                 x={cx - halfGap}
                 y={0}
                 width={halfGap * 2}
-                height={FRETBOARD_HEIGHT}
+                height={fretboardHeight}
                 fill="transparent"
                 className="cursor-pointer"
                 onClick={() => onFretClick?.(fret)}
@@ -166,7 +186,7 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
             const right = cx + r;
             // Tone-bar shape: domed (rounded) top, straight sides, flat bottom —
             // marks where the bar sits for this "Chord at Fret".
-            const d = `M ${left} ${r} A ${r} ${r} 0 0 1 ${right} ${r} L ${right} ${FRETBOARD_HEIGHT} L ${left} ${FRETBOARD_HEIGHT} Z`;
+            const d = `M ${left} ${r} A ${r} ${r} 0 0 1 ${right} ${r} L ${right} ${fretboardHeight} L ${left} ${fretboardHeight} Z`;
             return (
               <path
                 d={d}
@@ -186,7 +206,7 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
             <ChordFinderOverlay
               results={finderResults}
               fretboardWidth={fretboardWidth}
-              fretboardHeight={FRETBOARD_HEIGHT}
+              fretboardHeight={fretboardHeight}
               leftMargin={LEFT_MARGIN}
               targetChord={finderTargetChord}
             />
@@ -198,7 +218,7 @@ export function Fretboard({ copedent, engagedControls, displayMode, selectedKey,
               moves={moveResults}
               inspectedFret={moveInspectedFret}
               fretboardWidth={fretboardWidth}
-              fretboardHeight={FRETBOARD_HEIGHT}
+              fretboardHeight={fretboardHeight}
               leftMargin={LEFT_MARGIN}
               onInspectFret={(fret) => onMoveInspectFret?.(fret)}
             />
