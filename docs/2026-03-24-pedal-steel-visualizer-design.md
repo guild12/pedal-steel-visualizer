@@ -16,9 +16,10 @@ A browser-based tool that visualizes the notes available on a pedal steel guitar
 
 ## Tech Stack
 
-- **React 18** — component-based UI, state-driven rendering
+- **React 19** — component-based UI, state-driven rendering
 - **Vite** — dev server and build tooling
 - **Tailwind CSS** — utility-first styling
+- **Vitest + Testing Library** — unit and component tests
 - **SVG** — fretboard rendering (crisp, scalable, styleable)
 - **localStorage** — copedent persistence (v1, no backend)
 - **Static deploy** — Vercel, Netlify, or GitHub Pages
