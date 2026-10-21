@@ -5,6 +5,7 @@ import { noteNameToSemitone, getChordTones } from './chordDetection';
 import { generateValidCombinations, classifyKneeLevers } from './controlConstraints';
 import { INTERVAL_TO_FUNCTION } from './chordDictionary';
 
+// Inclusive: the fretboard draws frets 0-12, so the search must reach 12 too.
 const MAX_FRET = 12;
 
 export function findVoicings(
@@ -19,11 +20,10 @@ export function findVoicings(
 
   const results: VoicingResult[] = [];
 
-  for (let fret = 0; fret < MAX_FRET; fret++) {
+  for (let fret = 0; fret <= MAX_FRET; fret++) {
     for (const combo of validCombos) {
       const engagedSet = new Set(combo);
       const notes: VoicingNote[] = [];
-      let matchedTones = 0;
       const foundTones = new Set<number>();
 
       for (const stringConfig of copedent.strings) {
@@ -63,7 +63,6 @@ export function findVoicings(
         }
 
         if (isChordTone) {
-          matchedTones++;
           foundTones.add(semitone);
         }
 
