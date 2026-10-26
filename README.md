@@ -70,3 +70,7 @@ src/
 ```
 
 Utils have colocated test files (`*.test.ts`).
+
+## License
+
+[MIT](LICENSE)
